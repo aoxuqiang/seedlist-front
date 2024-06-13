@@ -14,7 +14,7 @@ const projects = [
 module.exports = [
   // user login
   {
-    url: '/vue-element-admin/project/list',
+    url: '/project/list',
     type: 'get',
     response: _ => {
       return {
@@ -26,7 +26,7 @@ module.exports = [
 
   // del project
   {
-    url: '/vue-element-admin/project/del',
+    url: '/project/del',
     type: 'post',
     response: _ => {
       return {

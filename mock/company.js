@@ -3,64 +3,52 @@ const companyList = [
     key: 1,
     fullName: '测试公司1',
     shortName: '测1',
-    address: '北京',
-    type: '融资公司'
+    addressDetail: '小营北路21号',
+    addressCode: [1],
+    addressDesc: ['北京市']
   },
   {
     key: 2,
     fullName: '测试公司2',
     shortName: '测2',
-    address: '上海',
-    type: '融资公司'
-  },
-  {
-    key: 3,
-    fullName: '测试公司3',
-    shortName: '测3',
-    address: '上海',
-    type: '投资公司'
-  },
-  {
-    key: 4,
-    fullName: '测试公司3',
-    shortName: '测4',
-    address: '上海',
-    type: '融资公司'
+    addressDetail: '并洲路51号',
+    addressCode: [1, 2],
+    addressDesc: ['山西省', '吕梁市']
   }
 ]
 
 const companyFinancing = [
   {
-    "turn": "天使轮",
-    "valuation": "100w",
-    "amount": "1200w",
-    "date": "2023-07",
-    "status": {
-      "value": 1,
-      "desc": "已融资",
+    'turn': '天使轮',
+    'valuation': '100w',
+    'amount': '1200w',
+    'date': '2023-07',
+    'status': {
+      'value': 1,
+      'desc': '已融资'
     }
   },
   {
-    "turn": "A轮",
-    "valuation": "1000w",
-    "amount": "12000w",
-    "date": "2023-08",
-    "status": {
-      "value": 2,
-      "desc": "待融资"
+    'turn': 'A轮',
+    'valuation': '1000w',
+    'amount': '12000w',
+    'date': '2023-08',
+    'status': {
+      'value': 2,
+      'desc': '待融资'
     }
   }
 ]
 
 const financingStatusList = [
   {
-    "value": 1,
-    "desc": "已融资",
+    'value': 1,
+    'desc': '已融资'
   },
   {
-    "value": 2,
-    "desc": "待融资",
-  },
+    'value': 2,
+    'desc': '待融资'
+  }
 ]
 
 module.exports = [
@@ -90,7 +78,7 @@ module.exports = [
     type: 'post',
     response: _ => {
       return {
-        code: 20000,
+        code: 20000
       }
     }
   },

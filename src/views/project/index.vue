@@ -3,13 +3,14 @@
   <div class="app-container">
     <div v-show="showlist == 1" id="list-project">
       <el-button type="primary" @click="handleAddProject">新增项目</el-button>
-      <el-table :data="projectList" style="width: 100%; margin-top: 30px" borderd>
-        <el-table-column align="center" label="项目ID">
+      <!-- 项目列表 -->
+      <el-table :data="projectList" border style="width: 100%; margin-top: 30px">
+        <el-table-column align="center" label="项目ID" width="100" fixed>
           <template slot-scope="scope">
             {{ scope.row.key }}
           </template>
         </el-table-column>
-        <el-table-column align="center" label="项目名称">
+        <el-table-column align="center" label="项目名称" width="100">
           <template slot-scope="scope">
             {{ scope.row.name }}
           </template>
@@ -19,17 +20,17 @@
             {{ scope.row.description }}
           </template>
         </el-table-column>
-        <el-table-column align="header-center" label="细分赛道">
+        <el-table-column align="header-center" label="细分赛道" width="100">
           <template slot-scope="scope">
             {{ scope.row.track }}
           </template>
         </el-table-column>
-        <el-table-column align="header-center" label="标签">
+        <el-table-column align="header-center" label="标签" width="300">
           <template slot-scope="scope">
             {{ scope.row.tags.map((tag) => tag.name).join('、') }}
           </template>
         </el-table-column>
-        <el-table-column align="center" label="Operations">
+        <el-table-column align="center" label="Operations" width="260" fixed="right">
           <template slot-scope="scope">
             <el-button type="primary" size="small" @click="handleEdit(scope)">Edit</el-button>
             <el-button type="danger" size="small" @click="handleDelete(scope)">Delete</el-button>
@@ -38,17 +39,18 @@
         </el-table-column>
       </el-table>
     </div>
+    <!-- 添加项目 -->
     <div v-show="showlist == 2" id="add-project" style="margin-top: 10px">
-      <el-form>
-        <el-form-item label="项目名称" label-width="100px">
+      <el-form ref="addProject" :model="addProject" :rules="rules">
+        <el-form-item label="项目名称" prop="name" label-width="100px">
           <el-input v-model.trim="addProject.name" />
         </el-form-item>
         <el-form-item label="标签" label-width="100px">
-          <el-drag-select v-model="addProject.tags" style="width: 500px" multiple placeholder="请选择">
-            <el-option v-for="item in tagList" :key="item.key" :label="item.name" :value="item.key" />
-          </el-drag-select>
+          <el-select v-model="addProject.tags" value-key="id" style="width: 500px" multiple placeholder="请选择">
+            <el-option v-for="item in tagList" :key="item.id" :label="item.name" :value="item" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="主打产品" label-width="100px">
+        <el-form-item label="主打产品" label-width="100px" prop="product">
           <el-input v-model.trim="addProject.product" />
         </el-form-item>
         <el-form-item label="应用领域" label-width="100px">
@@ -74,6 +76,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submit">保存</el-button>
+          <el-button type="warning" @click="cancel">取消</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -106,14 +109,25 @@ import ElDragSelect from '@/components/DragSelect'
 export default {
   name: 'MyProject',
   components: { ElDragSelect },
-  data() {
+  data () {
     return {
       projectList: [],
       showlist: 1,
       sendProject: {},
       sendUsers: [],
       addProject: {
+        name: '',
         tags: []
+      },
+      rules: {
+        name: [
+          { required: true, message: '请输入项目名称', trigger: 'blur' },
+          { min: 3, max: 5, message: '长度在1到20个字符', trigger: 'blur' }
+        ],
+        product: [
+          { required: true, message: '请输入产品', trigger: 'blur' },
+          { min: 1, max: 20, message: '长度在1-20个字符', trigger: 'blur' }
+        ]
       },
       companys: [],
       traceList: [
@@ -130,38 +144,58 @@ export default {
       value: []
     }
   },
-  created() {
+  created () {
     this.getPorjectList()
   },
   methods: {
-    submit() { },
-    async getPorjectList() {
+    submit () {
+      this.$refs['addProject'].validate((valid) => {
+        if (valid) {
+          // TODO 提交请求
+          console.log(this.addProject)
+          this.$message({
+            type: 'success',
+            message: '项目添加成功'
+          })
+          this.showlist = 1
+          console.log(this.projectList)
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    cancel () { // 取消处理
+      this.showlist = 1
+    },
+    async getPorjectList () {
       const res = await getProjects()
       this.projectList = res.data
     },
-    async getCompany() {
+    async getCompany () {
       const res = await getCompanyList()
       this.companys = res.data
     },
-    async getTagList() {
+    async getTagList () {
       const res = await getTags()
       this.tagList = res.data
     },
-    async getUserList() {
+    async getUserList () {
       const res = await getInvestorList()
       this.sendUsers = res.data
     },
-    handleEdit(scope) {
+    handleEdit (scope) {
       this.showlist = 2
-      this.addProject = scope.row
+      this.addProject = JSON.parse(JSON.stringify(scope.row))
+      console.log(this.addProject)
       this.getTagList()
     },
-    sendInfo(scope) {
+    sendInfo (scope) {
       this.sendProject = scope.row
       this.getUserList()
       this.showlist = 3
     },
-    sendSubmit() {
+    sendSubmit () {
       this.$message({
         type: 'success',
         message: '发送成功'
@@ -170,13 +204,13 @@ export default {
         this.showlist = 1
       }, 1000)
     },
-    handleDelete({ $index, row }) {
+    handleDelete ({ $index, row }) {
       this.$confirm('确认删除此项目?', '警告', {
         confirmButtonText: '确认',
         cancelButtonText: '取消',
         type: 'warning'
       })
-        .then(async() => {
+        .then(async () => {
           await delProject(row.key)
           this.projectList.splice($index, 1)
           this.$message({
@@ -188,12 +222,12 @@ export default {
           console.error(err)
         })
     },
-    handleAddProject() {
+    handleAddProject () {
       this.showlist = 2
       this.getCompany()
       this.getTagList()
     },
-    handleAvatarSuccess(res, file) {
+    handleAvatarSuccess (res, file) {
       console.log(res)
       console.log(file)
     }
@@ -206,4 +240,3 @@ export default {
   width: 300px;
 }
 </style>
-

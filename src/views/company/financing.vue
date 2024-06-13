@@ -49,7 +49,9 @@
           <el-input v-model="companyFinancingItem.amount" placeholder="请输入金额" />
         </el-form-item>
         <el-form-item label="融资状态">
-          <el-input v-model="companyFinancingItem.status" placeholder="请输入融资状态" />
+          <el-select v-model="companyFinancingItem.status" value-key="status">
+            <el-option v-for="item in rzStatus" :key="item.status" :label="item.desc" :value="item" />
+          </el-select>
         </el-form-item>
       </el-form>
       <div style="text-align:right;">
@@ -80,6 +82,10 @@ export default {
         { type: 1, name: '融资公司' },
         { type: 2, name: '对标公司' },
         { type: 3, name: '投资机构' }
+      ],
+      rzStatus: [
+        { status: 0, desc: '待融资' },
+        { status: 1, desc: '已融资' }
       ],
       companyType: {}
     }
