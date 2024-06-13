@@ -1,8 +1,8 @@
-//投资机构列表
+// 投资机构列表
 const investor = [
   {
     wxUserId: '1',
-    name: "test1",
+    name: 'test1',
     phone: '1123123123'
   },
   {
@@ -11,7 +11,6 @@ const investor = [
     phone: '123213123213'
   }
 ]
-
 
 module.exports = [
   {

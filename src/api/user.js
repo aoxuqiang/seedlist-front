@@ -5,29 +5,29 @@ import request from '@/utils/request'
  * @param {*} data
  * @returns
  */
-export function login(data) {
+export function login (data) {
   return request({
     // 这个是模拟测试接口
-    url: '/vue-element-admin/user/login',
-    // url: '/admin/login',
+    // url: '/vue-element-admin/user/login',
+    url: '/admin/login',
     method: 'post',
     data
   })
 }
 
-export function getInfo(token) {
+export function getInfo (token) {
   return request({
-    url: '/vue-element-admin/user/info',
-    // url: '/admin/info',
+    // url: '/vue-element-admin/user/info',
+    url: '/admin/info',
     method: 'get',
     params: { token }
   })
 }
 
-export function logout() {
+export function logout () {
   return request({
-    url: '/vue-element-admin/user/logout',
-    // url: '/amdin/logout',
+    // url: '/vue-element-admin/user/logout',
+    url: '/amdin/logout',
     method: 'post'
   })
 }

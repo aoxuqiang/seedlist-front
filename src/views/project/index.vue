@@ -87,9 +87,11 @@
           <el-input v-model.trim="sendProject.name" />
         </el-form-item>
         <el-form-item label="发送人" label-width="100px">
-          <el-drag-select v-model="sendUsers" style="width: 500px" multiple placeholder="请选择">
-            <el-option v-for="item in tagList" :key="item.wxUserId" :label="item.name" :value="item.wxUserId" />
-          </el-drag-select>
+          <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选</el-checkbox>
+          <div style="margin: 15px 0;" />
+          <el-checkbox-group v-model="sendUsers" @change="handleCheckedUserChange">
+            <el-checkbox v-for="u in users" :key="u.wxUserId" :label="u">{{ u.name }}</el-checkbox>
+          </el-checkbox-group>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="sendSubmit">发送</el-button>
@@ -104,16 +106,17 @@ import { getProjects, delProject } from '@/api/project'
 import { getCompanyList } from '@/api/company'
 import { getTags } from '@/api/tag'
 import { getInvestorList } from '@/api/investor'
-import ElDragSelect from '@/components/DragSelect'
 
 export default {
   name: 'MyProject',
-  components: { ElDragSelect },
   data () {
     return {
+      checkAll: false,
+      isIndeterminate: true,
       projectList: [],
       showlist: 1,
       sendProject: {},
+      users: [],
       sendUsers: [],
       addProject: {
         name: '',
@@ -148,6 +151,17 @@ export default {
     this.getPorjectList()
   },
   methods: {
+    handleCheckAllChange (val) {
+      console.log('===================', val)
+      this.sendUsers = val ? this.users : []
+      this.isIndeterminate = false
+    },
+    handleCheckedUserChange (value) {
+      const checkedCount = value.length
+      console.log('====================', value)
+      this.checkAll = checkedCount === this.users.length
+      this.isIndeterminate = checkedCount > 0 && checkedCount < this.users.length
+    },
     submit () {
       this.$refs['addProject'].validate((valid) => {
         if (valid) {
@@ -182,7 +196,7 @@ export default {
     },
     async getUserList () {
       const res = await getInvestorList()
-      this.sendUsers = res.data
+      this.users = res.data
     },
     handleEdit (scope) {
       this.showlist = 2
