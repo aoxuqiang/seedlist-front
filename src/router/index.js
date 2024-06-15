@@ -149,12 +149,34 @@ export const asyncRoutes = [
   {
     path: '/project',
     component: Layout,
+    meta: {
+      title: '项目管理',
+      icon: 'form'
+    },
     children: [
       {
-        path: 'index',
-        component: () => import('@/views/project/index'),
-        name: 'Project',
-        meta: { title: '项目管理', icon: 'form', noCache: true }
+        path: 'list',
+        component: () => import('@/views/project/list'),
+        name: 'Project-List',
+        meta: { title: '项目列表', icon: 'form', noCache: true }
+      },
+      {
+        path: 'detail',
+        component: () => import('@/views/project/detail'),
+        name: 'Project-Detail',
+        meta: { title: '项目详情', icon: 'form', noCache: true }
+      },
+      {
+        path: 'edit',
+        component: () => import('@/views/project/edit'),
+        name: 'Project-Edit',
+        meta: { title: '新增/修改项目', icon: 'form', noCache: true }
+      },
+      {
+        path: 'tag',
+        component: () => import('@/views/project/tag'),
+        name: 'Tag',
+        meta: { title: '标签管理', icon: 'form', noCache: true }
       }
     ]
   },
@@ -182,38 +204,46 @@ export const asyncRoutes = [
     ]
   },
   {
-    path: '/investor',
+    path: '/customer',
     component: Layout,
+    meta: {
+      title: '客户管理',
+      icon: 'peoples'
+    },
     children: [
       {
-        path: 'index',
-        component: () => import('@/views/investor/index'),
+        path: 'investor',
+        component: () => import('@/views/customer/investor'),
         name: 'Investor',
         meta: { title: '投资人', icon: 'user', noCache: true }
-      }
-    ]
-  },
-  {
-    path: '/investorOrg',
-    component: Layout,
-    children: [
+      },
       {
-        path: 'index',
-        component: () => import('@/views/investorg/index'),
-        name: 'Investor',
+        path: 'investorOrg',
+        component: () => import('@/views/customer/investorOrg'),
+        name: 'investorOrg',
         meta: { title: '投资机构', icon: 'international', noCache: true }
       }
     ]
   },
   {
-    path: '/tag',
+    path: '/meeting',
     component: Layout,
+    meta: {
+      title: '会议管理',
+      icon: 'list'
+    },
     children: [
       {
-        path: 'index',
-        component: () => import('@/views/tag/index'),
-        name: 'Tag',
-        meta: { title: '标签管理', icon: 'icon', noCache: true }
+        path: 'list',
+        component: () => import('@/views/meeting/list'),
+        name: 'MeetingList',
+        meta: { title: '会议列表', icon: 'list', noCache: true }
+      },
+      {
+        path: 'detail',
+        component: () => import('@/views/meeting/detail'),
+        name: 'MeetingDetail',
+        meta: { title: '会议详情', icon: 'list', noCache: true }
       }
     ]
   },

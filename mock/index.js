@@ -9,6 +9,7 @@ const project = require('./project')
 const tag = require('./tag')
 const company = require('./company')
 const investor = require('./investor')
+const meeting = require('./meeting')
 
 const mocks = [
   ...user,
@@ -18,7 +19,8 @@ const mocks = [
   ...project,
   ...tag,
   ...company,
-  ...investor
+  ...investor,
+  ...meeting
 ]
 
 // for front mock

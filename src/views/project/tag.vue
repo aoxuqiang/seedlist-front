@@ -4,7 +4,7 @@
     <el-table :data="tagList" style="width: 100%;margin-top:30px;" border>
       <el-table-column align="center" label="标签ID">
         <template slot-scope="scope">
-          {{ scope.row.key }}
+          {{ scope.row.id }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="标签名称">
@@ -23,7 +23,7 @@
     <el-dialog :visible.sync="dialogVisible" :title="dialogType === 'Edit' ? '修改标签' : '新增标签'">
       <el-form :model="tag" label-width="80px" label-position="left">
         <el-form-item v-if="dialogType === 'Edit'" label="标签ID">
-          <el-input v-model="tag.key" placeholder="标签ID" />
+          <el-input v-model="tag.id" placeholder="标签ID" disabled />
         </el-form-item>
         <el-form-item label="标签名称">
           <el-input v-model="tag.name" placeholder="标签名称" />
