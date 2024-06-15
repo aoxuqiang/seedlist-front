@@ -11,8 +11,24 @@ const projects = [
   }
 ]
 
+const project = {
+  id: 1,
+  pNo: 'P001',
+  name: '测试项目',
+  tags: [
+    {
+      id: 1,
+      name: 'tag1'
+    },
+    {
+      id: 2,
+      name: 'tag2'
+    }
+  ]
+}
+
 module.exports = [
-  // user login
+  // 项目列表
   {
     url: '/project/list',
     type: 'get',
@@ -23,8 +39,19 @@ module.exports = [
       }
     }
   },
+  // 根据id 查询项目
+  {
+    url: '/project/detail',
+    type: 'get',
+    response: _ => {
+      return {
+        code: 20000,
+        data: project
+      }
+    }
+  },
 
-  // del project
+  // 删除项目
   {
     url: '/project/del',
     type: 'post',

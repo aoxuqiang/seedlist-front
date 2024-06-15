@@ -1,11 +1,12 @@
 <!-- eslint-disable space-before-function-paren -->
 <template>
   <div class="app-container">
-    <div v-show="showlist == 1" id="list-project">
-      <el-button type="primary" @click="handleAddProject">新增项目</el-button>
+    <!-- 展示项目列表 -->
+    <div v-show="showType == 1" id="list-project">
+      <el-button type="primary" @click="dealAdd">新增项目</el-button>
       <!-- 项目列表 -->
       <el-table :data="projectList" border style="width: 100%; margin-top: 30px">
-        <el-table-column align="center" label="项目ID" width="100" fixed>
+        <el-table-column align="center" label="项目编号" width="100" fixed>
           <template slot-scope="scope">
             {{ scope.row.key }}
           </template>
@@ -15,32 +16,29 @@
             {{ scope.row.name }}
           </template>
         </el-table-column>
-        <el-table-column align="header-center" label="一句话简介">
+        <el-table-column align="header-center" label="项目简介">
           <template slot-scope="scope">
             {{ scope.row.description }}
           </template>
         </el-table-column>
-        <el-table-column align="header-center" label="细分赛道" width="100">
-          <template slot-scope="scope">
-            {{ scope.row.track }}
-          </template>
-        </el-table-column>
-        <el-table-column align="header-center" label="标签" width="300">
+        <!-- <el-table-column align="header-center" label="标签" width="300">
           <template slot-scope="scope">
             {{ scope.row.tags.map((tag) => tag.name).join('、') }}
           </template>
-        </el-table-column>
-        <el-table-column align="center" label="Operations" width="260" fixed="right">
+        </el-table-column> -->
+        <el-table-column align="center" label="Operations" width="500" fixed="right">
           <template slot-scope="scope">
-            <el-button type="primary" size="small" @click="handleEdit(scope)">Edit</el-button>
-            <el-button type="danger" size="small" @click="handleDelete(scope)">Delete</el-button>
+            <el-button type="primary" size="small" @click="showDetail(scope)">查询详情</el-button>
+            <el-button type="warning" size="small" @click="handleEdit(scope)">编辑</el-button>
+            <el-button type="danger" size="small" @click="handleDelete(scope)">删除</el-button>
             <el-button type="primary" size="small" @click="sendInfo(scope)">发送项目</el-button>
+            <el-button type="primary" size="small" @click="sendInfo(scope)">发送BP</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
-    <!-- 添加项目 -->
-    <div v-show="showlist == 2" id="add-project" style="margin-top: 10px">
+    <!-- 新增、编辑项目 -->
+    <div v-show="showType == 2" id="add-project" style="margin-top: 10px">
       <el-form ref="addProject" :model="addProject" :rules="rules">
         <el-form-item label="项目名称" prop="name" label-width="100px">
           <el-input v-model.trim="addProject.name" />
@@ -80,14 +78,18 @@
         </el-form-item>
       </el-form>
     </div>
-
-    <div v-show="showlist == 3" id="send-project" style="margin-top: 10px">
+    <!-- 发送项目或BP -->
+    <div v-show="showType == 3" id="send-project" style="margin-top: 10px">
       <el-form>
         <el-form-item label="项目名称" label-width="100px">
           <el-input v-model.trim="sendProject.name" />
         </el-form-item>
         <el-form-item label="发送人" label-width="100px">
-          <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选</el-checkbox>
+          <el-checkbox
+            v-model="checkAll"
+            :indeterminate="isIndeterminate"
+            @change="handleCheckAllChange"
+          >全选</el-checkbox>
           <div style="margin: 15px 0;" />
           <el-checkbox-group v-model="sendUsers" @change="handleCheckedUserChange">
             <el-checkbox v-for="u in users" :key="u.wxUserId" :label="u">{{ u.name }}</el-checkbox>
@@ -114,7 +116,7 @@ export default {
       checkAll: false,
       isIndeterminate: true,
       projectList: [],
-      showlist: 1,
+      showType: 1, // 1-展示项目列表  2- 展示项目详情  3-新增、修改项目  4- 发送BP
       sendProject: {},
       users: [],
       sendUsers: [],
@@ -199,7 +201,7 @@ export default {
       this.users = res.data
     },
     handleEdit (scope) {
-      this.showlist = 2
+      this.showType = 2
       this.addProject = JSON.parse(JSON.stringify(scope.row))
       console.log(this.addProject)
       this.getTagList()
@@ -236,10 +238,10 @@ export default {
           console.error(err)
         })
     },
-    handleAddProject () {
-      this.showlist = 2
-      this.getCompany()
-      this.getTagList()
+    dealAdd () {
+      this.$router.push({
+        name: 'edit'
+      })
     },
     handleAvatarSuccess (res, file) {
       console.log(res)

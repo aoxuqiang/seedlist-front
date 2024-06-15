@@ -1,18 +1,18 @@
 <template>
   <div class="app-container">
-    <el-button type="primary" @click="syncInvestor">同步投资人</el-button>
+    <el-button type="primary" @click="createMeeting">创建会议</el-button>
     <el-table :data="investorList" style="width: 100%;margin-top:30px;" border>
-      <el-table-column align="center" label="微信用户ID" width="100px">
+      <el-table-column align="center" label="会议ID" width="100px">
         <template slot-scope="scope">
-          {{ scope.row.wxUserId }}
+          {{ scope.row.id }}
         </template>
       </el-table-column>
-      <el-table-column align="center" label="名称" width="200px">
+      <el-table-column align="center" label="会议名称" width="200px">
         <template slot-scope="scope">
           <a :href="scope.row.name" target="_blank" class="homelink">{{ scope.row.name }}</a>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="手机号" :show-overflow-tooltip="true">
+      <el-table-column align="center" label="关联项目" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           {{ scope.row.phone }}
         </template>
