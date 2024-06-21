@@ -3,16 +3,30 @@
   <!-- 新增、编辑项目 -->
   <div id="edit-project" style="margin-top: 10px">
     <el-form ref="project" :model="project" :rules="rules">
+      <el-form-item label="项目编号" prop="no" label-width="100px">
+        <el-input v-model.trim="project.no" :disabled="optType == 2" />
+      </el-form-item>
       <el-form-item label="项目名称" prop="name" label-width="100px">
         <el-input v-model.trim="project.name" />
       </el-form-item>
+      <el-form-item label="关联公司" label-width="100px" prop="companyId">
+        <el-select v-model="project.companyId" value-key="id" style="width: 500px" placeholder="请选择">
+          <el-option v-for="item in companys" :key="item.id" :label="item.name" :value="item.id" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="项目简介" prop="brief" label-width="100px">
+        <el-input v-model.trim="project.brief" />
+      </el-form-item>
       <el-form-item label="标签" label-width="100px">
-        <el-select v-model="project.tags" value-key="id" style="width: 500px" multiple placeholder="请选择">
+        <el-select v-model="project.tagList" value-key="id" style="width: 500px" multiple placeholder="请选择">
           <el-option v-for="item in tagList" :key="item.id" :label="item.name" :value="item" />
         </el-select>
       </el-form-item>
       <el-form-item label="主打产品" label-width="100px" prop="product">
         <el-input v-model.trim="project.product" />
+      </el-form-item>
+      <el-form-item label="核心客户" label-width="100px">
+        <el-input v-model.trim="project.custom" />
       </el-form-item>
       <el-form-item label="应用领域" label-width="100px">
         <el-input v-model.trim="project.domain" />
@@ -27,7 +41,7 @@
         <el-input v-model.trim="project.remark" />
       </el-form-item>
       <el-form-item label="BP" label-width="100px">
-        <el-input v-model.trim="project.bpUrl" />
+        <el-input v-model.trim="project.bp" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submit">保存</el-button>
@@ -37,7 +51,7 @@
 </template>
 
 <script>
-import { getProject } from '@/api/project'
+import { getProject, saveProject } from '@/api/project'
 import { getCompanyList } from '@/api/company'
 import { getTags } from '@/api/tag'
 
@@ -53,11 +67,14 @@ export default {
       rules: {
         name: [
           { required: true, message: '请输入项目名称', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在1到20个字符', trigger: 'blur' }
+          { min: 3, max: 20, message: '长度在1到20个字符', trigger: 'blur' }
         ],
         product: [
           { required: true, message: '请输入产品', trigger: 'blur' },
           { min: 1, max: 20, message: '长度在1-20个字符', trigger: 'blur' }
+        ],
+        companyId: [
+          { required: true, message: '请选择关联公司', trigger: 'blur' }
         ]
       },
       companys: [],
@@ -77,13 +94,14 @@ export default {
   },
   created () {
     this.getTagList()
+    this.getCompanys()
     if (this.$route.query.id) {
       this.optType = 2
       this.getProject(this.$route.query.id)
     }
   },
   methods: {
-    async getCompany () {
+    async getCompanys () {
       const res = await getCompanyList()
       this.companys = res.data
     },
@@ -95,16 +113,17 @@ export default {
       const res = await getProject(id)
       this.project = res.data
     },
+    async saveProject (project) {
+      await saveProject(project)
+    },
     submit () {
       this.$refs['project'].validate((valid) => {
         if (valid) {
-          console.log(this.project)
+          this.saveProject(this.project)
           this.$message({
             type: 'success',
             message: '项目添加成功'
           })
-          this.showlist = 1
-          console.log(this.projectList)
         } else {
           console.log('error submit!!')
           return false

@@ -6,7 +6,7 @@
         <el-divider content-position="left">详细信息</el-divider>
         <el-row>
           <el-col :span="16">
-            项目编号: {{ project.pno }}
+            项目编号: {{ project.no }}
           </el-col>
         </el-row>
         <el-row>
@@ -19,7 +19,7 @@
         </el-row>
         <el-row>
           <el-col :span="8">
-            项目简介：{{ project.desc }}
+            项目简介：{{ project.brief }}
           </el-col>
           <el-col :span="8">
             核心产品： {{ project.product }}
@@ -38,7 +38,7 @@
             应用领域：{{ project.domain }}
           </el-col>
           <el-col :span="8">
-            标签： {{ project.tags.map((tag) => tag.name).join('、') }}
+            标签： {{ project.tagList.map((tag) => tag.name).join('、') }}
           </el-col>
         </el-row>
       </el-main>
@@ -46,7 +46,7 @@
     <el-container>
       <el-header>
         <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-          <el-menu-item index="1">浏览记录</el-menu-item>
+          <el-menu-item index="1">BP申请</el-menu-item>
           <el-menu-item index="2">发送记录</el-menu-item>
           <el-menu-item index="3">会议记录</el-menu-item>
         </el-menu>
@@ -55,7 +55,7 @@
         <el-table :data="scanList" border style="width: 100%; margin-top: 30px">
           <el-table-column align="center" label="用户id" width="100" fixed>
             <template slot-scope="scope">
-              {{ scope.row.wxUserId }}
+              {{ scope.row.userId }}
             </template>
           </el-table-column>
           <el-table-column align="center" label="用户名称" width="150">
@@ -63,9 +63,14 @@
               {{ scope.row.name }}
             </template>
           </el-table-column>
-          <el-table-column align="header-center" label="浏览时间">
+          <el-table-column align="header-center" label="申请时间">
             <template slot-scope="scope">
-              {{ scope.row.scanTime }}
+              {{ scope.row.createdTime }}
+            </template>
+          </el-table-column>
+          <el-table-column align="header-center" label="操作">
+            <template slot-scope="scope">
+              <el-button v-if="scope.row.type == 1" type="primary" size="small" @click="sendBP(scope.row.id)">发送BP</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -115,28 +120,17 @@
 </template>
 
 <script>
-import { getProject } from '@/api/project'
+import { getProject, getScanList, postBP } from '@/api/project'
 
 export default {
   name: 'MyProject',
   data () {
     return {
       project: {
-        tags: [],
+        tagList: [],
         company: {}
       },
-      scanList: [
-        {
-          'wxUserId': '123',
-          'name': '张三',
-          'scanTime': '2024-4-16 12:29:00'
-        },
-        {
-          'wxUserId': '456',
-          'name': '李四',
-          'scanTime': '2024-4-16 12:29:00'
-        }
-      ],
+      scanList: [],
       sendList: [
         {
           'wxUserId': '12321',
@@ -157,12 +151,24 @@ export default {
     if (this.$route.query.id) {
       console.log('===============', this.$route.query.id)
       this.getPorject(this.$route.query['id'])
+      this.getScanList()
     }
   },
   methods: {
+    async getScanList () {
+      const res = await getScanList()
+      this.scanList = res.data
+    },
     async getPorject (id) {
       const res = await getProject(id)
       this.project = res.data
+    },
+    async sendBP (id) {
+      await postBP(id)
+      this.$message({
+        type: 'success',
+        message: '发送成功'
+      })
     },
     handleAvatarSuccess (res, file) {
       console.log(res)

@@ -4,22 +4,17 @@
     <el-table :data="filterList.length ? filterList : companyList" style="width: 100%;margin-top:30px;" border>
       <el-table-column align="center" label="公司ID" width="100px">
         <template slot-scope="scope">
-          {{ scope.row.key }}
+          {{ scope.row.id }}
         </template>
       </el-table-column>
-      <el-table-column align="center" label="公司简称">
+      <el-table-column align="center" label="公司名称">
         <template slot-scope="scope">
-          {{ scope.row.shortName }}
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="公司全称" width="200px">
-        <template slot-scope="scope">
-          {{ scope.row.fullName }}
+          {{ scope.row.name }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="公司地址">
         <template slot-scope="scope">
-          {{ compAddr(scope.row.addressDesc, scope.row.addressDetail) }}
+          {{ scope.row.area + ' '+ scope.row.address }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="Operations" width="300px">
@@ -34,19 +29,21 @@
     <el-dialog :visible.sync="dialogVisible" :title="dialogType === 'Edit' ? '修改公司' : '新增公司'">
       <el-form :model="company" label-width="80px" label-position="left">
         <el-form-item v-if="dialogType === 'Edit'" label="公司ID">
-          <el-input v-model="company.key" placeholder="公司ID" readonly />
+          <el-input v-model="company.id" placeholder="公司ID" readonly disabled />
         </el-form-item>
-        <el-form-item label="公司全称">
-          <el-input v-model="company.fullName" placeholder="公司全称" />
-        </el-form-item>
-        <el-form-item label="公司简称">
-          <el-input v-model="company.shortName" placeholder="请输入公司简称" />
+        <el-form-item label="公司名称">
+          <el-input v-model="company.name" placeholder="公司名称" />
         </el-form-item>
         <el-form-item label="公司地址">
-          <el-cascader v-model="value" :options="options" :props="{ expandTrigger: 'hover' }" @change="handleChange" />
+          <el-cascader
+            v-model="area"
+            :options="options"
+            :props="{ expandTrigger: 'hover', label: 'areaName', value: 'areaId' }"
+            @change="handleChange"
+          />
         </el-form-item>
         <el-form-item label="详细地址">
-          <el-input v-model="company.addressDetail" placeholder="请输入公司详细地址" />
+          <el-input v-model="company.address" placeholder="请输入公司详细地址" />
         </el-form-item>
       </el-form>
       <div style="text-align:right;">
@@ -59,6 +56,7 @@
 
 <script>
 import { getCompanyList, saveCompany, delCompany } from '@/api/company'
+import { getRegions } from '@/api/region'
 
 export default {
   // 公司机构管理
@@ -71,31 +69,8 @@ export default {
       dialogVisible: false,
       dialogType: 'New',
       company: {},
-      value: [],
-      options: [
-        {
-          value: 1,
-          label: '北京',
-          children: [
-            { value: 2, label: '东城区' },
-            { value: 3, label: '西城区' }
-          ]
-        },
-        {
-          value: 2,
-          label: '山西省',
-          children: [
-            {
-              value: 4,
-              label: '吕梁',
-              children: [
-                { value: 10, label: '兴县' },
-                { value: 10, label: '易县' }
-              ]
-            }
-          ]
-        }
-      ]
+      area: [],
+      options: []
     }
   },
   computed: {
@@ -133,13 +108,21 @@ export default {
     },
     handleEdit (scope) {
       this.company = scope.row
+      this.area = scope.row.values
+      this.getAddrOptions()
       this.dialogType = 'Edit'
       this.dialogVisible = true
     },
     handleAddCompany () {
       this.company = {}
+      this.area = []
+      this.getAddrOptions()
       this.dialogType = 'New'
       this.dialogVisible = true
+    },
+    async getAddrOptions () {
+      const res = await getRegions()
+      this.options = res.data
     },
     finaningRecord (scope) {
       this.$router.push({
@@ -150,20 +133,12 @@ export default {
       })
     },
     async confirmCompany () {
-      const isEdit = this.dialogType === 'Edit'
-      if (isEdit) {
-        await saveCompany(this.company)
-        for (let index = 0; index < this.companyList.length; index++) {
-          if (this.companyList[index].key === this.company.key) {
-            this.companyList.splice(index, 1, Object.assign({}, this.company))
-            break
-          }
-        }
-      } else {
-        await saveCompany(this.company)
-        this.company.key = Math.round(Math.random() * 100)
-        this.companyList.push(this.company)
+      if (this.area.length > 0) {
+        this.company.areaId = this.area[this.area.length - 1]
       }
+      console.log('选择地区', this.value)
+      await saveCompany(this.company)
+      this.getCompanyList()
       this.dialogVisible = false
       this.$notify({
         title: 'Success',

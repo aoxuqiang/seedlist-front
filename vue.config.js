@@ -37,7 +37,13 @@ module.exports = {
       errors: true
     },
     before: require('./mock/mock-server.js'), // 使用mock-server
-    disableHostCheck: true // 正式环境需要去掉
+    disableHostCheck: true, // 正式环境需要去掉
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8008',
+        changeOrigin: true
+      }
+    }
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that

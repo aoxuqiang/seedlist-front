@@ -1,23 +1,23 @@
 import request from '@/utils/request'
 
-export function getInvestorList() {
+export function getInvestorList () {
   return request({
-    url: '/vue-element-admin/investor/list',
+    url: '/investor/list',
     method: 'get'
   })
 }
 
-export function saveInvestor(data) {
+export function saveInvestor (data) {
   return request({
-    url: '/vue-element-admin/investor/save',
+    url: '/investor/save',
     method: 'post',
     data
   })
 }
 
-export function delInvestor(id) {
+export function delInvestor (id) {
   return request({
-    url: '/vue-element-admin/investor/del',
+    url: '/investor/del',
     method: 'post',
     params: { id: id }
   })

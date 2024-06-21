@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 获取公司列表
 export function getCompanyList () {
   return request({
-    url: '/vue-element-admin/company/list',
+    url: '/company/list',
     method: 'get'
   })
 }
@@ -11,7 +11,7 @@ export function getCompanyList () {
 // 保存公司 更新或添加
 export function saveCompany (data) {
   return request({
-    url: '/vue-element-admin/company/save',
+    url: '/company/save',
     method: 'post',
     data
   })
@@ -27,7 +27,7 @@ export function delCompany (id) {
 
 export function saveCompanyFinancing (data) {
   return request({
-    url: '/vue-element-admin/company/financing/save',
+    url: '/company/financing/save',
     method: 'post',
     data
   })
@@ -35,7 +35,7 @@ export function saveCompanyFinancing (data) {
 
 export function getCompanyFinancing (companyId) {
   return request({
-    url: '/vue-element-admin/company/financing/list',
+    url: '/company/financing/list',
     method: 'get',
     params: { companyId: companyId }
   })
@@ -43,7 +43,7 @@ export function getCompanyFinancing (companyId) {
 
 export function delCompanyFinancing (id) {
   return request({
-    url: '/vue-element-admin/company/financing/del',
+    url: '/company/financing/del',
     method: 'post',
     params: { id: id }
   })
@@ -51,7 +51,7 @@ export function delCompanyFinancing (id) {
 
 export function getFinancingStatusList () {
   return request({
-    url: '/vue-element-admin/financing/status/list',
+    url: '/financing/status/list',
     method: 'get'
   })
 }

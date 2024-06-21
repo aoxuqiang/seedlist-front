@@ -38,30 +38,6 @@
         </template>
       </el-table-column>
     </el-table>
-
-    <el-dialog :visible.sync="dialogVisible" :title="dialogType === 'Edit' ? '修改会议' : '新增会议'">
-      <el-form :model="meeting" label-width="80px" label-position="left">
-        <el-form-item v-if="dialogType === 'Edit'" label="ID">
-          <el-input v-model="meeting.id" placeholder="会议ID" disabled />
-        </el-form-item>
-        <el-form-item label="会议名称">
-          <el-input v-model="meeting.name" placeholder="标签名称" />
-        </el-form-item>
-        <el-form-item label="会议时间">
-          <el-date-picker
-            v-model="meeting.meetingTime"
-            type="datetime"
-            placeholder="请选择会议时间"
-            align="right"
-            :picker-options="pickerOptions"
-          />
-        </el-form-item>
-      </el-form>
-      <div style="text-align:right;">
-        <el-button type="danger" @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="confirm">确认</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 

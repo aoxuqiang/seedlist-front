@@ -67,7 +67,7 @@ export default {
         type: 'warning'
       })
         .then(async () => {
-          await delTag(row.key)
+          await delTag(row.id)
           this.tagList.splice($index, 1)
           this.$message({
             type: 'success',
@@ -89,20 +89,8 @@ export default {
       this.dialogVisible = true
     },
     async confirmTag () {
-      const isEdit = this.dialogType === 'Edit'
-      if (isEdit) {
-        await saveTag(this.tag)
-        for (let index = 0; index < this.tagList.length; index++) {
-          if (this.tagList[index].key === this.tag.key) {
-            this.tagList.splice(index, 1, Object.assign({}, this.tag))
-            break
-          }
-        }
-      } else {
-        await saveTag(this.tag)
-        this.tag.key = Math.round(Math.random() * 100)
-        this.tagList.push(this.tag)
-      }
+      await saveTag(this.tag)
+      this.getTagList()
       this.dialogVisible = false
       this.$notify({
         title: 'Success',

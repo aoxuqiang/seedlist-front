@@ -8,7 +8,7 @@
       <el-table :data="projectList" border style="width: 100%; margin-top: 30px">
         <el-table-column align="center" label="项目编号" width="100" fixed>
           <template slot-scope="scope">
-            {{ scope.row.pno }}
+            {{ scope.row.no }}
           </template>
         </el-table-column>
         <el-table-column align="center" label="项目名称" width="150">
@@ -18,7 +18,7 @@
         </el-table-column>
         <el-table-column align="header-center" label="项目简介">
           <template slot-scope="scope">
-            {{ scope.row.desc }}
+            {{ scope.row.brief }}
           </template>
         </el-table-column>
         <el-table-column align="center" label="Operations" fixed="right" width="600">
