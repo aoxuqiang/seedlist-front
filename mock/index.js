@@ -1,26 +1,26 @@
 const Mock = require('mockjs')
 const { param2Obj } = require('./utils')
 
-const user = require('./user')
+const user = require('./admin')
 const role = require('./role')
 const article = require('./article')
 const search = require('./remote-search')
 const project = require('./project')
 const tag = require('./tag')
 const company = require('./company')
-const investor = require('./investor')
+const investor = require('./user')
 const meeting = require('./meeting')
 
 const mocks = [
-  ...user,
-  ...role,
-  ...article,
-  ...search,
-  ...project,
-  ...tag,
-  ...company,
-  ...investor,
-  ...meeting
+  // ...user,
+  // ...role,
+  // ...article,
+  // ...search,
+  // ...project,
+  // ...tag,
+  // ...company,
+  // ...investor,
+  // ...meeting
 ]
 
 // for front mock

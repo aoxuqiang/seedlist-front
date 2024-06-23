@@ -1,82 +1,25 @@
-const tokens = {
-  admin: {
-    token: 'admin-token'
+// 投资机构列表
+const investor = [
+  {
+    wxUserId: '1',
+    name: 'test1',
+    phone: '1123123123'
   },
-  editor: {
-    token: 'editor-token'
+  {
+    wxUserId: '2',
+    name: 'test2',
+    phone: '123213123213'
   }
-}
-
-const users = {
-  'admin-token': {
-    roles: ['admin'],
-    introduction: 'I am a super administrator',
-    avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-    name: 'Super Admin'
-  },
-  'editor-token': {
-    roles: ['editor'],
-    introduction: 'I am an editor',
-    avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-    name: 'Normal Editor'
-  }
-}
+]
 
 module.exports = [
-  // user login
   {
-    url: '/admin/login',
-    type: 'post',
-    response: config => {
-      const { username } = config.body
-      const token = tokens[username]
-
-      // mock error
-      if (!token) {
-        return {
-          code: 60204,
-          message: 'Account and password are incorrect.'
-        }
-      }
-
-      return {
-        code: 20000,
-        data: token
-      }
-    }
-  },
-
-  // get user info
-  {
-    url: '/admin/info\.*',
+    url: '/vue-element-admin/investor/list',
     type: 'get',
-    response: config => {
-      const { token } = config.query
-      const info = users[token]
-
-      // mock error
-      if (!info) {
-        return {
-          code: 50008,
-          message: 'Login failed, unable to get user details.'
-        }
-      }
-
-      return {
-        code: 20000,
-        data: info
-      }
-    }
-  },
-
-  // user logout
-  {
-    url: '/vue-element-admin/user/logout',
-    type: 'post',
     response: _ => {
       return {
         code: 20000,
-        data: 'success'
+        data: investor
       }
     }
   }

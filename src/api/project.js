@@ -17,17 +17,33 @@ export function getProjects () {
 
 export function getScanList (id) {
   return request({
-    url: '/event/list',
+    url: '/common/projectScan',
     method: 'get',
     params: { projectId: id }
   })
 }
 
-export function postBP (id) {
+export function getBpApplyList (id) {
   return request({
-    url: '/wx/sendBP',
+    url: '/common/bpApply',
     method: 'get',
-    params: { eventId: id }
+    params: { projectId: id }
+  })
+}
+
+export function getBpSendList (id) {
+  return request({
+    url: '/common/bpSend',
+    method: 'get',
+    params: { projectId: id }
+  })
+}
+
+export function sendBP2Users (projectId, uids) {
+  return request({
+    url: '/project/sendBP2Users',
+    method: 'get',
+    params: { projectId, uids }
   })
 }
 
@@ -51,6 +67,14 @@ export function sendProject (users, projectId) {
   return request({
     url: '/project/send',
     params: { users: users, projectId: projectId },
+    method: 'post'
+  })
+}
+
+export function changeShow (id, show) {
+  return request({
+    url: '/project/updateShow',
+    params: { id: id, show: show },
     method: 'post'
   })
 }

@@ -14,14 +14,14 @@
       </el-table-column>
       <el-table-column align="center" label="关联项目">
         <template slot-scope="scope">
-          <router-link :to=" {path: '../project/detail',query:{id: scope.row.project.id}} ">
-            <el-link type="success">{{ scope.row.project.name }}</el-link>
+          <router-link :to="{ path: '../project/detail', query: { id: scope.row.projectId } }">
+            <el-link type="success">{{ scope.row.projectName }}</el-link>
           </router-link>
         </template>
       </el-table-column>
       <el-table-column align="center" label="会议时间">
         <template slot-scope="scope">
-          {{ scope.row.meetingTime }}
+          {{ scope.row.startTime }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="会议链接">

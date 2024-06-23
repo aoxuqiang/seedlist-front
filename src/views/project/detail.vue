@@ -46,64 +46,89 @@
     <el-container>
       <el-header>
         <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-          <el-menu-item index="1">BP申请</el-menu-item>
-          <el-menu-item index="2">发送记录</el-menu-item>
-          <el-menu-item index="3">会议记录</el-menu-item>
+          <el-menu-item index="1">浏览记录</el-menu-item>
+          <el-menu-item index="2">BP申请记录</el-menu-item>
+          <el-menu-item index="3">BP发送记录</el-menu-item>
+          <el-menu-item index="4">会议记录</el-menu-item>
         </el-menu>
       </el-header>
       <el-main v-if="activeIndex == 1">
         <el-table :data="scanList" border style="width: 100%; margin-top: 30px">
           <el-table-column align="center" label="用户id" width="100" fixed>
             <template slot-scope="scope">
-              {{ scope.row.userId }}
+              {{ scope.row.uid }}
             </template>
           </el-table-column>
           <el-table-column align="center" label="用户名称" width="150">
             <template slot-scope="scope">
-              {{ scope.row.name }}
+              {{ scope.row.uname }}
             </template>
           </el-table-column>
-          <el-table-column align="header-center" label="申请时间">
+          <el-table-column align="header-center" label="浏览时间">
+            <template slot-scope="scope">
+              {{ scope.row.createdTime }}
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-main>
+      <el-main v-if="activeIndex == 2">
+        <el-table :data="applyList" border style="width: 100%; margin-top: 30px">
+          <el-table-column align="center" label="用户id" width="150">
+            <template slot-scope="scope">
+              {{ scope.row.uid }}
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="用户名称" width="150">
+            <template slot-scope="scope">
+              {{ scope.row.uname }}
+            </template>
+          </el-table-column>
+          <el-table-column align="header-center" label="发送时间">
             <template slot-scope="scope">
               {{ scope.row.createdTime }}
             </template>
           </el-table-column>
           <el-table-column align="header-center" label="操作">
             <template slot-scope="scope">
-              <el-button v-if="scope.row.type == 1" type="primary" size="small" @click="sendBP(scope.row.id)">发送BP</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-main>
-      <el-main v-if="activeIndex == 2">
-        <el-table :data="sendList" border style="width: 100%; margin-top: 30px">
-          <el-table-column align="center" label="类型" width="150">
-            <template slot-scope="scope">
-              {{ scope.row.type == 1? '发送项目' : '发送BP' }}
-            </template>
-          </el-table-column>
-          <el-table-column align="center" label="用户id" width="150">
-            <template slot-scope="scope">
-              {{ scope.row.wxUserId }}
-            </template>
-          </el-table-column>
-          <el-table-column align="header-center" label="发送时间">
-            <template slot-scope="scope">
-              {{ scope.row.sendTime }}
+              <el-button type="primary" size="small" @click="sendBP(scope.row.id)">发送BP</el-button>
             </template>
           </el-table-column>
         </el-table>
       </el-main>
       <el-main v-if="activeIndex == 3">
+        <el-table :data="sendList" border style="width: 100%; margin-top: 30px">
+          <el-table-column align="center" label="用户id" width="150">
+            <template slot-scope="scope">
+              {{ scope.row.uid }}
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="用户名称" width="150">
+            <template slot-scope="scope">
+              {{ scope.row.uname }}
+            </template>
+          </el-table-column>
+          <el-table-column align="header-center" label="发送时间">
+            <template slot-scope="scope">
+              {{ scope.row.createdTime }}
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-main>
+      <el-main v-if="activeIndex == 4">
         <el-table :data="meetingList" border style="width: 100%; margin-top: 30px">
+          <el-table-column align="center" label="会议ID" width="100">
+            <template slot-scope="scope">
+              {{ scope.row.id }}
+            </template>
+          </el-table-column>
           <el-table-column align="center" label="会议名称" width="150">
             <template slot-scope="scope">
               {{ scope.row.name }}
             </template>
           </el-table-column>
-          <el-table-column align="header-center" label="会议时间" width="150">
+          <el-table-column align="header-center" label="会议时间" width="200">
             <template slot-scope="scope">
-              {{ scope.row.meetingTime }}
+              {{ scope.row.startTime }}
             </template>
           </el-table-column>
           <el-table-column align="center" label="操作">
@@ -120,7 +145,8 @@
 </template>
 
 <script>
-import { getProject, getScanList, postBP } from '@/api/project'
+import { getProject, getScanList, getBpApplyList, getBpSendList } from '@/api/project'
+import { getProjectMeetings } from '@/api/meeting'
 
 export default {
   name: 'MyProject',
@@ -131,40 +157,53 @@ export default {
         company: {}
       },
       scanList: [],
-      sendList: [
-        {
-          'wxUserId': '12321',
-          'sendTime': '2024-4-16 12:29:00'
-        }
-      ],
-      meetingList: [
-        {
-          'id': 1,
-          'name': '会议1',
-          'meetingTime': '2024-4-16 12:29:00'
-        }
-      ],
-      activeIndex: 0
+      applyList: [],
+      sendList: [],
+      meetingList: [],
+      activeIndex: 1
     }
   },
   created () {
     if (this.$route.query.id) {
       console.log('===============', this.$route.query.id)
-      this.getPorject(this.$route.query['id'])
-      this.getScanList()
+      this.getPorject(this.$route.query.id)
+      this.getScanList(this.$route.query.id)
+      this.getBpApplyList(this.$route.query.id)
+      this.getBpSendList(this.$route.query.id)
+      this.getMeetingList(this.$route.query.id)
     }
   },
   methods: {
-    async getScanList () {
-      const res = await getScanList()
-      this.scanList = res.data
-    },
+    // 查询项目详情
     async getPorject (id) {
       const res = await getProject(id)
       this.project = res.data
     },
+    // 查询项目浏览记录
+    async getScanList (id) {
+      const res = await getScanList(id)
+      this.scanList = res.data
+    },
+    // 查询BP申请记录
+    async getBpApplyList (id) {
+      const res = await getBpApplyList(id)
+      this.applyList = res.data
+    },
+
+    // 查询BP发送记录
+    async getBpSendList (id) {
+      const res = await getBpSendList(id)
+      this.sendList = res.data
+    },
+
+    async getMeetingList (id) {
+      const res = await getProjectMeetings(id)
+      this.meetingList = res.data
+    },
+
+    // 操作发送BP
     async sendBP (id) {
-      await postBP(id)
+      // TODO
       this.$message({
         type: 'success',
         message: '发送成功'
@@ -183,15 +222,18 @@ export default {
 
 <style>
 .el-row {
-    margin-bottom: 10px;
-    &:last-child {
-      margin-bottom: 0;
-    }
+  margin-bottom: 10px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
+
 .el-input {
   width: 300px;
 }
+
 .link {
-  font-size:17px;
+  font-size: 17px;
 }
 </style>

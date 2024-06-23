@@ -212,15 +212,15 @@ export const asyncRoutes = [
     },
     children: [
       {
-        path: 'investor',
-        component: () => import('@/views/customer/investor'),
+        path: 'user',
+        component: () => import('@/views/customer/user'),
         name: 'Investor',
         meta: { title: '投资人', icon: 'user', noCache: true }
       },
       {
-        path: 'investorOrg',
-        component: () => import('@/views/customer/investorOrg'),
-        name: 'investorOrg',
+        path: 'org',
+        component: () => import('@/views/customer/org'),
+        name: 'org',
         meta: { title: '投资机构', icon: 'international', noCache: true }
       }
     ]

@@ -24,11 +24,16 @@
         <el-table-column align="center" label="Operations" fixed="right" width="600">
           <template slot-scope="scope">
             <el-button type="primary" size="small" @click="linkDetail(scope.row.id)">查询详情</el-button>
-            <el-button type="primary" size="small" @click="linkDetail(scope.row.id)" v-text="scope.row.status == 0 ? '上架' : '下架'" />
+            <el-button
+              :type="scope.row.show == 0 ? 'primary' : 'danger'"
+              size="small"
+              @click="changeShow(scope.row)"
+              v-text="scope.row.show == 0 ? '上架' : '下架'"
+            />
             <el-button type="warning" size="small" @click="linkEdit(scope.row.id)">编辑</el-button>
             <el-button type="danger" size="small" @click="handleDelete(scope)">删除</el-button>
             <el-button type="primary" size="small" @click="creMeeting(scope)">创建会议</el-button>
-            <el-button type="primary" size="small" @click="sendInfo(scope)">发送项目/BP</el-button>
+            <el-button type="primary" size="small" @click="sendInfo(scope)">发送BP</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -42,13 +47,12 @@
         <el-form-item label="发送人" label-width="100px">
           <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选</el-checkbox>
           <div style="margin: 15px 0;" />
-          <el-checkbox-group v-model="sendUsers" @change="handleCheckedUserChange">
-            <el-checkbox v-for="u in users" :key="u.wxUserId" :label="u">{{ u.name }}</el-checkbox>
+          <el-checkbox-group v-model="sendUsers" value-key="id" @change="handleCheckedUserChange">
+            <el-checkbox v-for="u in users" :key="u.id" :label="u">{{ u.name }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="sendSubmit(1)">发送项目</el-button>
-          <el-button type="primary" @click="sendSubmit(2)">发送BP</el-button>
+          <el-button type="primary" @click="sendSubmit()">发送BP</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -56,12 +60,7 @@
       <el-form :model="meeting" label-width="80px" label-position="left">
         <el-form-item label="会议时间">
           <div>
-            <el-date-picker
-              :key="project.id"
-              v-model="meeting.meetingTime"
-              type="datetime"
-              placeholder="请选择会议时间"
-            />
+            <el-date-picker :key="project.id" v-model="meeting.startTime" type="datetime" placeholder="请选择会议时间" />
           </div>
         </el-form-item>
         <el-form-item label="会议名称">
@@ -80,9 +79,9 @@
 </template>
 
 <script>
-import { getProjects, delProject } from '@/api/project'
+import { getProjects, delProject, changeShow, sendBP2Users } from '@/api/project'
 import { getCompanyList } from '@/api/company'
-import { getInvestorList } from '@/api/investor'
+import { getUserList } from '@/api/user'
 import { saveMeeting } from '@/api/meeting'
 
 export default {
@@ -112,16 +111,6 @@ export default {
         ]
       },
       companys: [],
-      traceList: [
-        {
-          id: 1,
-          name: '半导体'
-        },
-        {
-          id: 2,
-          name: '新能源'
-        }
-      ],
       tagList: [],
       value: [],
       project: {},
@@ -136,9 +125,31 @@ export default {
       this.project = scope.row
       this.dialogVisible = true
     },
+    async changeShow (item) {
+      const msg = item.show === 0 ? '确认上架此项目' : '确认下架此项目'
+      const num = 1 - item.show
+      const id = item.id
+      this.$confirm(msg, '警告', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async (item) => {
+          await changeShow(id, num)
+          item.show = num
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    },
+    dateFormate (date) {
+      // 格式化日期
+      var formattedDate = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2) + ' ' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2)
+      return formattedDate
+    },
     async confirmAddMeeting () {
       this.meeting.projectId = this.project.id
-      console.log('addMeetingInfo:', this.meeting)
+      this.meeting.startTime = this.dateFormate(this.meeting.startTime)
       await saveMeeting(this.meeting)
       this.$message({
         type: 'success',
@@ -185,7 +196,9 @@ export default {
       this.showlist = 1
     },
     async getPorjectList () {
+      console.log('开始http请求')
       const res = await getProjects()
+      console.log('请求响应数据', res.data)
       this.projectList = res.data
     },
     async getCompany () {
@@ -193,7 +206,7 @@ export default {
       this.companys = res.data
     },
     async getUserList () {
-      const res = await getInvestorList()
+      const res = await getUserList()
       this.users = res.data
     },
     linkAdd () {
@@ -212,14 +225,17 @@ export default {
       this.getUserList()
       this.showType = 2
     },
-    sendSubmit (type) {
-      // TODO 发送项目
+    async sendSubmit () {
+      const projectId = this.sendProject.id
+      console.log('sendUsers', this.sendUsers)
+      const sendUsers = this.sendUsers.map(item => item.id).join(',')
+      await sendBP2Users(projectId, sendUsers)
       this.$message({
         type: 'success',
         message: '发送成功'
       })
       setTimeout(() => {
-        this.showlist = 1
+        this.showType = 1
       }, 1000)
     },
     handleDelete ({ $index, row }) {
@@ -229,7 +245,7 @@ export default {
         type: 'warning'
       })
         .then(async () => {
-          await delProject(row.key)
+          await delProject(row.id)
           this.projectList.splice($index, 1)
           this.$message({
             type: 'success',

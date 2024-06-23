@@ -1,16 +1,26 @@
 import request from '@/utils/request'
 
-export function getMeetingInviteList (id) {
+export function getProjectMeetings (id) {
   return request({
-    url: '/meeting/invite/list?id=' + id,
-    method: 'get'
+    url: '/meeting/project',
+    method: 'get',
+    params: { projectId: id }
   })
 }
 
-export function getMeetingSignList (id) {
+export function getMeetingInviteList (id) {
   return request({
-    url: '/meeting/sign/list?id=' + id,
-    method: 'get'
+    url: '/meeting/invite/list',
+    method: 'get',
+    params: { meetingId: id }
+  })
+}
+
+export function getMeetingApplyList (id) {
+  return request({
+    url: '/meeting/apply/list',
+    method: 'get',
+    params: { meetingId: id }
   })
 }
 
@@ -36,10 +46,10 @@ export function delMeeting (id) {
   })
 }
 
-export function saveMeeting (metting) {
+export function saveMeeting (data) {
   return request({
     url: '/meeting/save',
-    body: metting,
-    method: 'post'
+    method: 'post',
+    data
   })
 }

@@ -36,10 +36,10 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    before: require('./mock/mock-server.js'), // 使用mock-server
+    // before: require('./mock/mock-server.js'), // 使用mock-server
     disableHostCheck: true, // 正式环境需要去掉
     proxy: {
-      '/api': {
+      '/': {
         target: 'http://localhost:8008',
         changeOrigin: true
       }

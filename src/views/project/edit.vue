@@ -10,7 +10,7 @@
         <el-input v-model.trim="project.name" />
       </el-form-item>
       <el-form-item label="关联公司" label-width="100px" prop="companyId">
-        <el-select v-model="project.companyId" value-key="id" style="width: 500px" placeholder="请选择">
+        <el-select v-model="project.companyId" style="width: 500px" placeholder="请选择">
           <el-option v-for="item in companys" :key="item.id" :label="item.name" :value="item.id" />
         </el-select>
       </el-form-item>
@@ -77,6 +77,7 @@ export default {
           { required: true, message: '请选择关联公司', trigger: 'blur' }
         ]
       },
+      company: {},
       companys: [],
       traceList: [
         {
@@ -95,15 +96,15 @@ export default {
   created () {
     this.getTagList()
     this.getCompanys()
-    if (this.$route.query.id) {
-      this.optType = 2
-      this.getProject(this.$route.query.id)
-    }
   },
   methods: {
     async getCompanys () {
       const res = await getCompanyList()
       this.companys = res.data
+      if (this.$route.query.id) {
+        this.optType = 2
+        this.getProject(this.$route.query.id)
+      }
     },
     async getTagList () {
       const res = await getTags()
@@ -122,8 +123,9 @@ export default {
           this.saveProject(this.project)
           this.$message({
             type: 'success',
-            message: '项目添加成功'
+            message: '项目更新成功'
           })
+          this.$router.push('list')
         } else {
           console.log('error submit!!')
           return false
