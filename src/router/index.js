@@ -173,6 +173,12 @@ export const asyncRoutes = [
         meta: { title: '新增/修改项目', icon: 'form', noCache: true }
       },
       {
+        path: 'industry',
+        component: () => import('@/views/project/insutry'),
+        name: 'Industry',
+        meta: { title: '行业管理', icon: 'form', noCache: true }
+      },
+      {
         path: 'tag',
         component: () => import('@/views/project/tag'),
         name: 'Tag',
