@@ -45,7 +45,11 @@
           <el-input v-model.trim="sendProject.name" disabled />
         </el-form-item>
         <el-form-item label="发送人" label-width="100px">
-          <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选</el-checkbox>
+          <el-checkbox
+            v-model="checkAll"
+            :indeterminate="isIndeterminate"
+            @change="handleCheckAllChange"
+          >全选</el-checkbox>
           <div style="margin: 15px 0;" />
           <el-checkbox-group v-model="sendUsers" value-key="id" @change="handleCheckedUserChange">
             <el-checkbox v-for="u in users" :key="u.id" :label="u">{{ u.name }}</el-checkbox>
@@ -221,6 +225,7 @@ export default {
       })
     },
     sendInfo (scope) {
+      this.sendUsers = []
       this.sendProject = scope.row
       this.getUserList()
       this.showType = 2
@@ -234,6 +239,7 @@ export default {
         type: 'success',
         message: '发送成功'
       })
+      this.sendUsers = []
       setTimeout(() => {
         this.showType = 1
       }, 1000)

@@ -8,6 +8,14 @@ export function getProjectMeetings (id) {
   })
 }
 
+export function saveMeetingInvite (meetingId, uids) {
+  return request({
+    url: '/meeting/invite',
+    method: 'post',
+    params: { meetingId, uids }
+  })
+}
+
 export function getMeetingInviteList (id) {
   return request({
     url: '/meeting/invite/list',

@@ -119,13 +119,13 @@ export default {
       this.dialogVisible = true
     },
     handleDelete ({ $index, row }) {
-      this.$confirm('确认删除此公司?', '警告', {
+      this.$confirm('确认删除此融资记录？', '警告', {
         confirmButtonText: '确认',
         cancelButtonText: '取消',
         type: 'warning'
       })
         .then(async () => {
-          await delCompanyFinancing(row.key)
+          await delCompanyFinancing(row.id)
           this.companyFinancingList.splice($index, 1)
           this.$message({
             type: 'success',

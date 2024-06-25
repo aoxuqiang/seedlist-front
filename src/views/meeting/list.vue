@@ -1,7 +1,6 @@
 <template>
   <div class="app-container">
-    <el-button type="primary" @click="addMeeting">新增会议</el-button>
-    <el-table :data="meetingList" style="width: 100%;margin-top:30px;" border>
+    <el-table v-show="!showSend" :data="meetingList" style="width: 100%;margin-top:30px;" border>
       <el-table-column align="center" label="ID">
         <template slot-scope="scope">
           {{ scope.row.id }}
@@ -31,19 +30,43 @@
       </el-table-column>
       <el-table-column align="center" label="Operations" fixed="right" width="400">
         <template slot-scope="scope">
-          <el-button type="danger" size="small" @click="linkDetail(scope)">会议详情</el-button>
-          <el-button type="danger" size="small" @click="handleDelete(scope)">发送邀请</el-button>
-          <el-button type="primary" size="small" @click="handleEdit(scope)">修改</el-button>
+          <el-button type="primary" size="small" @click="linkDetail(scope)">会议详情</el-button>
+          <el-button type="primary" size="small" @click="handleSend(scope.row)">发送邀请</el-button>
+          <el-button type="warning" size="small" @click="handleEdit(scope)">修改</el-button>
           <el-button type="danger" size="small" @click="handleDelete(scope)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
+
+    <div v-show="showSend" id="send-project" style="margin-top: 10px">
+      <el-form :model="meeting">
+        <el-form-item label="会议名称" label-width="100px">
+          <el-input v-model.trim="meeting.name" disabled />
+        </el-form-item>
+        <el-form-item label="发送人" label-width="100px">
+          <el-checkbox
+            v-model="checkAll"
+            :indeterminate="isIndeterminate"
+            @change="handleCheckAllChange"
+          >全选</el-checkbox>
+          <div style="margin: 15px 0;" />
+          <el-checkbox-group v-model="sendUsers" value-key="id" @change="handleCheckedUserChange">
+            <el-checkbox v-for="u in userList" :key="u.id" :label="u">{{ u.name }}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="showSend = !showSend">取消</el-button>
+          <el-button type="primary" @click="confirmSend()">发送会议邀请</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
   </div>
 </template>
 
 <script>
-import { getMeetingList, delMeeting, saveMeeting } from '@/api/meeting'
+import { getMeetingList, delMeeting, saveMeetingInvite } from '@/api/meeting'
 import { getProjects } from '@/api/project'
+import { getUserList } from '@/api/user'
 
 export default {
   // 标签管理
@@ -52,9 +75,12 @@ export default {
   data () {
     return {
       meetingList: [],
-      dialogVisible: false,
-      dialogType: 'New',
-      meeting: {}
+      showSend: false,
+      meeting: {},
+      userList: [],
+      sendUsers: [],
+      checkAll: false,
+      isIndeterminate: true
     }
   },
   created () {
@@ -68,6 +94,12 @@ export default {
     async getProjectList () {
       const res = await getProjects()
       this.projects = res.data
+    },
+    async handleSend (meeting) {
+      this.meeting = meeting
+      const res = await getUserList()
+      this.userList = res.data
+      this.showSend = true
     },
     handleDelete ({ $index, row }) {
       this.$confirm('确认删除此会议?', '警告', {
@@ -93,37 +125,28 @@ export default {
         query: { id: scope.row.id }
       })
     },
-    addMeeting () {
-      this.meeting = {}
-      this.dialogType = 'New'
-      this.dialogVisible = true
-    },
     handleEdit (scope) {
       this.tag = scope.row
       this.dialogType = 'Edit'
       this.dialogVisible = true
     },
-    async confirm () {
-      const isEdit = this.dialogType === 'Edit'
-      if (isEdit) {
-        await saveMeeting(this.tag)
-        for (let index = 0; index < this.tagList.length; index++) {
-          if (this.tagList[index].key === this.tag.key) {
-            this.tagList.splice(index, 1, Object.assign({}, this.tag))
-            break
-          }
-        }
-      } else {
-        await saveMeeting(this.tag)
-        this.tag.key = Math.round(Math.random() * 100)
-        this.tagList.push(this.tag)
-      }
-      this.dialogVisible = false
-      this.$notify({
-        title: 'Success',
-        dangerouslyUseHTMLString: true,
-        type: 'success'
+    handleCheckAllChange (val) {
+      console.log('===================', val)
+      this.sendUsers = val ? this.userList : []
+      this.isIndeterminate = false
+    },
+    handleCheckedUserChange (value) {
+      const checkedCount = value.length
+      this.checkAll = checkedCount === this.userList.length
+      this.isIndeterminate = checkedCount > 0 && checkedCount < this.userList.length
+    },
+    async confirmSend () {
+      await saveMeetingInvite(this.meeting.id, this.sendUsers.map(item => item.id).join(','))
+      this.$message({
+        type: 'success',
+        message: '发送成功'
       })
+      this.showSend = false
     }
   }
 }

@@ -1,4 +1,4 @@
-//投资机构列表
+// 投资机构列表
 const investorOrgList = [
   {
     key: 1,
@@ -16,7 +16,7 @@ const investorOrgList = [
 
 module.exports = [
   {
-    url: '/vue-element-admin/investorOrg/list',
+    url: '/org/list',
     type: 'get',
     response: _ => {
       return {

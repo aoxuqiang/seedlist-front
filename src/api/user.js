@@ -6,3 +6,11 @@ export function getUserList () {
     method: 'get'
   })
 }
+
+export function updateOrg (id, orgId) {
+  return request({
+    url: '/user/org',
+    method: 'post',
+    params: { id, orgId }
+  })
+}

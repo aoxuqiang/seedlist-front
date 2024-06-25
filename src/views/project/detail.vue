@@ -90,7 +90,7 @@
           </el-table-column>
           <el-table-column align="header-center" label="操作">
             <template slot-scope="scope">
-              <el-button type="primary" size="small" @click="sendBP(scope.row.id)">发送BP</el-button>
+              <el-button type="primary" size="small" @click="sendBP(scope.row)">发送BP</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -143,7 +143,7 @@
 </template>
 
 <script>
-import { getProject, getScanList, getBpApplyList, getBpSendList } from '@/api/project'
+import { getProject, getScanList, getBpApplyList, getBpSendList, sendBP2Users } from '@/api/project'
 import { getProjectMeetings } from '@/api/meeting'
 
 export default {
@@ -206,8 +206,8 @@ export default {
     },
 
     // 操作发送BP
-    async sendBP (id) {
-      // TODO
+    async sendBP (row) {
+      await sendBP2Users(row.projectId, row.uid)
       this.$message({
         type: 'success',
         message: '发送成功'

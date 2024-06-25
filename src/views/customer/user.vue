@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-table :data="userList" style="width: 60%;margin-top:30px;" border>
+    <el-table :data="userList" style="width: 100%;margin-top:30px;" border>
       <el-table-column align="center" label="微信用户ID" width="100px">
         <template slot-scope="scope">
           {{ scope.row.id }}
@@ -8,7 +8,12 @@
       </el-table-column>
       <el-table-column align="center" label="名称" width="200px">
         <template slot-scope="scope">
-          <a :href="scope.row.name" target="_blank" class="homelink">{{ scope.row.name }}</a>
+          <a :href="scope.row.name" target="_blank">{{ scope.row.name }}</a>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="所属机构">
+        <template slot-scope="scope">
+          <a :href="scope.row.name" target="_blank">{{ getOrg(scope.row.orgId) }}</a>
         </template>
       </el-table-column>
       <el-table-column align="center" label="手机号" :show-overflow-tooltip="true">
@@ -23,18 +28,20 @@
       </el-table-column>
       <el-table-column align="center" label="Operations" width="300px">
         <template slot-scope="scope">
-          <el-button type="primary" size="small" @click="handleOrg(scope)">关联机构</el-button>
+          <el-button type="primary" size="small" @click="handleOrg(scope.row)">关联机构</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <el-dialog :visible.sync="dialogVisible" :title="关联投资机构">
-      <el-form :model="org" label-width="80px" label-position="left">
+    <el-dialog :visible.sync="dialogVisible" title="关联投资机构">
+      <el-form :model="user" label-width="80px" label-position="left">
         <el-form-item label="用户名称">
           <el-input v-model="user.name" disable />
         </el-form-item>
-        <el-form-item label="机构名称">
-          <el-input v-model="org.name" placeholder="请输入机构名称" />
+        <el-form-item label="关联机构" prop="orgId">
+          <el-select v-model="user.orgId" value-key="id" style="width: 500px" placeholder="请选择">
+            <el-option v-for="item in orgList" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
         </el-form-item>
       </el-form>
       <div style="text-align:left;">
@@ -46,7 +53,8 @@
 </template>
 
 <script>
-import { getUserList } from '@/api/user'
+import { getUserList, updateOrg } from '@/api/user'
+import { getOrgList } from '@/api/org'
 
 export default {
   name: 'UserManage', // 投资人管理
@@ -57,16 +65,38 @@ export default {
       user: {},
       dialogVisible: false,
       dialogType: 'New',
-      orgId: null
+      orgList: []
+    }
+  },
+  computed: {
+    getOrg () {
+      return (item) => {
+        if (item != null) {
+          return this.orgList.filter(t => t.id === item)[0].name
+        }
+      }
     }
   },
   created () {
+    this.getOrgList()
     this.getUserList()
   },
   methods: {
+    async getOrgList () {
+      const res = await getOrgList()
+      this.orgList = res.data
+    },
     async getUserList () {
       const res = await getUserList()
       this.userList = res.data
+    },
+    handleOrg (user) {
+      this.dialogVisible = true
+      this.user = user
+    },
+    async confirmOrg () {
+      await updateOrg(this.user.id, this.user.orgId)
+      this.dialogVisible = false
     }
   }
 }
