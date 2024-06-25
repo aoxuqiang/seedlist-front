@@ -1,7 +1,6 @@
 <template>
   <div class="app-container">
-    <el-button type="primary" @click="syncInvestor">同步投资人</el-button>
-    <el-table :data="userList" style="width: 100%;margin-top:30px;" border>
+    <el-table :data="userList" style="width: 60%;margin-top:30px;" border>
       <el-table-column align="center" label="微信用户ID" width="100px">
         <template slot-scope="scope">
           {{ scope.row.id }}
@@ -17,7 +16,32 @@
           {{ scope.row.mobile }}
         </template>
       </el-table-column>
+      <el-table-column align="center" label="邮箱" :show-overflow-tooltip="true">
+        <template slot-scope="scope">
+          {{ scope.row.email }}
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="Operations" width="300px">
+        <template slot-scope="scope">
+          <el-button type="primary" size="small" @click="handleOrg(scope)">关联机构</el-button>
+        </template>
+      </el-table-column>
     </el-table>
+
+    <el-dialog :visible.sync="dialogVisible" :title="关联投资机构">
+      <el-form :model="org" label-width="80px" label-position="left">
+        <el-form-item label="用户名称">
+          <el-input v-model="user.name" disable />
+        </el-form-item>
+        <el-form-item label="机构名称">
+          <el-input v-model="org.name" placeholder="请输入机构名称" />
+        </el-form-item>
+      </el-form>
+      <div style="text-align:left;">
+        <el-button type="danger" @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="confirmOrg">确认</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -30,13 +54,14 @@ export default {
   data () {
     return {
       userList: [],
+      user: {},
       dialogVisible: false,
       dialogType: 'New',
-      investor: {}
+      orgId: null
     }
   },
   created () {
-    this.getInvestorList()
+    this.getUserList()
   },
   methods: {
     async getUserList () {

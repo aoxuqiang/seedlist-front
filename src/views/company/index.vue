@@ -14,7 +14,7 @@
       </el-table-column>
       <el-table-column align="center" label="公司地址">
         <template slot-scope="scope">
-          {{ scope.row.area + ' '+ scope.row.address }}
+          {{ scope.row.area + ' ' + scope.row.address }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="Operations" width="300px">
@@ -128,7 +128,7 @@ export default {
       this.$router.push({
         path: '/company/financing',
         query: {
-          companyId: scope.row.key
+          companyId: scope.row.id
         }
       })
     },

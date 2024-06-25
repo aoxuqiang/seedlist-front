@@ -46,10 +46,10 @@
     <el-container>
       <el-header>
         <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-          <el-menu-item index="1">浏览记录</el-menu-item>
-          <el-menu-item index="2">BP申请记录</el-menu-item>
-          <el-menu-item index="3">BP发送记录</el-menu-item>
-          <el-menu-item index="4">会议记录</el-menu-item>
+          <el-menu-item index="1">浏览记录({{ scanList.length }})</el-menu-item>
+          <el-menu-item index="2">BP申请记录({{ applyList.length }})</el-menu-item>
+          <el-menu-item index="3">BP发送记录({{ sendList.length }})</el-menu-item>
+          <el-menu-item index="4">会议记录({{ meetingList.length }})</el-menu-item>
         </el-menu>
       </el-header>
       <el-main v-if="activeIndex == 1">
@@ -133,9 +133,7 @@
           </el-table-column>
           <el-table-column align="center" label="操作">
             <template slot-scope="scope">
-              <el-button type="primary" size="small" @click="linkDetail(scope.row.id)">查询详情</el-button>
-              <el-button type="warning" size="small" @click="linkEdit(scope.row.id)">编辑</el-button>
-              <el-button type="danger" size="small" @click="handleDelete(scope)">删除</el-button>
+              <el-button type="primary" size="small" @click="linkMeeting(scope.row.id)">查询详情</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -174,6 +172,12 @@ export default {
     }
   },
   methods: {
+    linkMeeting (id) {
+      this.$router.push({
+        path: '../meeting/detail',
+        query: { id }
+      })
+    },
     // 查询项目详情
     async getPorject (id) {
       const res = await getProject(id)

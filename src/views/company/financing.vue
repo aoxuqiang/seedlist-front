@@ -1,14 +1,10 @@
 <template>
   <div class="app-container">
-    融资公司
-    <el-select v-model="company" placeholder="请选择" value-key="key" filterable @change="changeCompany(company)">
-      <el-option v-for="item in companyList" :key="item.key" :label="item.shortName" :value="item" />
-    </el-select>
     <el-button type="primary" style="margin-left: 20px;" @click="handleAddFinancing">新增融资</el-button>
     <el-table :data="companyFinancingList" style="width: 100%;margin-top:30px;" border>
       <el-table-column align="center" label="融资轮次">
         <template slot-scope="scope">
-          {{ scope.row.turn }}
+          {{ computeTurn(scope.row.turn) }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="现估值">
@@ -23,7 +19,7 @@
       </el-table-column>
       <el-table-column align="center" label="融资状态">
         <template slot-scope="scope">
-          {{ scope.row.status.desc }}
+          {{ computeState(scope.row.state) }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="Operations">
@@ -35,12 +31,11 @@
     </el-table>
 
     <el-dialog :visible.sync="dialogVisible" :title="dialogType === 'Edit' ? '修改融资' : '新增融资'">
-      <el-form :model="companyFinancingItem" label-width="80px" label-position="left">
-        <el-form-item label="公司全称">
-          {{ company.shortName }}
-        </el-form-item>
+      <el-form :model="companyFinancingItem" label-position="left">
         <el-form-item label="融资轮次">
-          <el-input v-model="companyFinancingItem.turn" placeholder="请输入融资轮次" />
+          <el-select v-model="companyFinancingItem.turn" placeholder="请选择融资轮次">
+            <el-option v-for="item in turns" :key="item.code" :label="item.desc" :value="item.code" />
+          </el-select>
         </el-form-item>
         <el-form-item label="公司估值">
           <el-input v-model="companyFinancingItem.valuation" placeholder="请输入金额" />
@@ -49,21 +44,21 @@
           <el-input v-model="companyFinancingItem.amount" placeholder="请输入金额" />
         </el-form-item>
         <el-form-item label="融资状态">
-          <el-select v-model="companyFinancingItem.status" value-key="status">
-            <el-option v-for="item in rzStatus" :key="item.status" :label="item.desc" :value="item" />
+          <el-select v-model="companyFinancingItem.state">
+            <el-option v-for="item in rzStatus" :key="item.state" :label="item.desc" :value="item.state" />
           </el-select>
         </el-form-item>
       </el-form>
       <div style="text-align:right;">
         <el-button type="danger" @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="confirmCompany">确认</el-button>
+        <el-button type="primary" @click="confirmCompanyFinancing">确认</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getCompanyList, getCompanyFinancing, saveCompanyFinancing, delCompanyFinancing, getFinancingStatusList } from '@/api/company'
+import { getCompanyFinancing, saveCompanyFinancing, delCompanyFinancing, getTurnList } from '@/api/company'
 
 export default {
   // 公司机构管理
@@ -71,52 +66,55 @@ export default {
   components: {},
   data () {
     return {
-      company: {},
-      companyList: [],
+      turns: [],
+      companyId: null,
       companyFinancingList: [],
       companyFinancingItem: {},
-      financingStatusList: [],
       dialogVisible: false,
       dialogType: 'New',
-      companyTypes: [
-        { type: 1, name: '融资公司' },
-        { type: 2, name: '对标公司' },
-        { type: 3, name: '投资机构' }
-      ],
       rzStatus: [
-        { status: 0, desc: '待融资' },
-        { status: 1, desc: '已融资' }
-      ],
-      companyType: {}
+        { state: 0, desc: '待融资' },
+        { state: 1, desc: '已融资' }
+      ]
+    }
+  },
+  computed: {
+    computeTurn () {
+      return (item) => {
+        return this.turns.filter(t => t.code === item)[0].desc
+      }
+    },
+    computeState () {
+      return (item) => {
+        return this.rzStatus.filter(t => t.state === item)[0].desc
+      }
     }
   },
   created () {
-    this.getCompanyList()
+    this.getTurns()
     if (this.$route.query.companyId) {
-      this.getCompanyFinancing(this.$route.query.companyId)
+      this.companyId = this.$route.query.companyId
+      this.getCompanyFinancing(this.companyId)
     }
   },
   methods: {
-    async getCompanyList () {
-      const res = await getCompanyList()
-      this.companyList = res.data
-      if (this.$route.query.companyId) {
-        this.company = this.companyList.find(item => item.key === this.$route.query.companyId)
-      }
+    async getTurns () {
+      const res = await getTurnList()
+      this.turns = res.data
     },
     async getCompanyFinancing (companyId) {
       const res = await getCompanyFinancing(companyId)
       this.companyFinancingList = res.data
     },
-    changeCompany (item) {
-      this.getCompanyFinancing(item.key)
-      this.company = item
+    changeCompany (company) {
+      this.getCompanyFinancing(company.id)
     },
     handleAddFinancing () {
-      if (!this.company.key) {
+      if (!this.companyId) {
         this.$message({ type: 'warning', message: '请先选择融资公司' })
         return
       }
+      this.companyFinancingItem = {}
       this.dialogType = 'New'
       this.dialogVisible = true
     },
@@ -142,30 +140,20 @@ export default {
       this.companyFinancingItem = scope.row
       this.dialogType = 'Edit'
       this.dialogVisible = true
-      const res = await getFinancingStatusList()
-      this.financingStatusList = res.data
     },
     async confirmCompanyFinancing () {
       const isEdit = this.dialogType === 'Edit'
-      if (isEdit) {
-        await saveCompanyFinancing(this.companyFinancingItem)
-        for (let index = 0; index < this.companyFinancingList.length; index++) {
-          if (this.companyFinancingList[index].key === this.companyFinancingItem.key) {
-            this.companyFinancingList.splice(index, 1, Object.assign({}, this.companyFinancingItem))
-            break
-          }
-        }
-      } else {
-        await saveCompanyFinancing(this.companyFinancingItem)
-        this.companyFinancingItem.key = Math.round(Math.random() * 100)
-        this.companyFinancingList.push(this.company)
-      }
+      this.companyFinancingItem.companyId = this.companyId
+      await saveCompanyFinancing(this.companyFinancingItem)
       this.dialogVisible = false
       this.$notify({
         title: 'Success',
         dangerouslyUseHTMLString: true,
         type: 'success'
       })
+      if (!isEdit) {
+        this.getCompanyFinancing(this.companyId)
+      }
     },
     // 关键字搜索
     keywordChange (keywords) {

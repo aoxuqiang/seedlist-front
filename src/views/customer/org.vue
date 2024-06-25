@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
-    <el-button type="primary" @click="handleAddInvestor">新增投资机构</el-button>
-    <el-table :data="investorList" style="width: 100%;margin-top:30px;" border>
+    <el-button type="primary" @click="handleAdd">新增投资机构</el-button>
+    <el-table :data="orgList" style="width: 100%;margin-top:30px;" border>
       <el-table-column align="center" label="机构ID" width="100px">
         <template slot-scope="scope">
-          {{ scope.row.key }}
+          {{ scope.row.id }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="机构名称" width="200px">
@@ -31,49 +31,72 @@
     </el-table>
 
     <el-dialog :visible.sync="dialogVisible" :title="dialogType === 'Edit' ? '修改投资机构' : '新增投资机构'">
-      <el-form :model="investor" label-width="80px" label-position="left">
+      <el-form :model="org" label-width="80px" label-position="left">
         <el-form-item v-if="dialogType === 'Edit'" label="机构ID">
-          <el-input v-model="investor.key" placeholder="投资机构ID" readonly />
+          <el-input v-model="org.key" placeholder="投资机构ID" readonly />
         </el-form-item>
         <el-form-item label="机构名称">
-          <el-input v-model="investor.name" placeholder="公司全称" />
+          <el-input v-model="org.name" placeholder="请输入机构名称" />
         </el-form-item>
         <el-form-item label="机构简介">
-          <el-input v-model="investor.desc" placeholder="公司简称" type="textarea" />
+          <el-input v-model="org.desc" placeholder="请输入机构简介" />
         </el-form-item>
         <el-form-item label="机构官网">
-          <el-input v-model="investor.homelink" placeholder="机构官网" />
+          <el-input v-model="org.homelink" placeholder="机构官网" />
         </el-form-item>
       </el-form>
-      <div style="text-align:right;">
+      <div style="text-align:left;">
         <el-button type="danger" @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="confirmInvestor">确认</el-button>
+        <el-button type="primary" @click="confirmAdd">确认</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getUserList } from '@/api/user'
+import { getOrgList, saveOrg } from '@/api/org'
 
 export default {
-  name: 'InvestorManage', // 公司机构管理
+  name: 'OrgManage', // 公司机构管理
   components: {},
   data () {
     return {
-      investorList: [],
+      orgList: [],
+      org: {},
       dialogVisible: false,
-      dialogType: 'New',
-      investor: {}
+      dialogType: 'New'
     }
   },
   created () {
-    this.getInvestorList()
+    this.getOrgList()
   },
   methods: {
-    async getInvestorList () {
-      const res = await getUserList()
-      this.investorList = res.data
+    async getOrgList () {
+      const res = await getOrgList()
+      this.orgList = res.data
+    },
+    handleAdd () {
+      this.org = {}
+      this.dialogType === 'New'
+      this.dialogVisible = true
+    },
+    handleEdit (scope) {
+      this.org = scope.row
+      this.dialogType === 'Edit'
+      this.dialogVisible = true
+    },
+    async confirmAdd () {
+      const isEdit = this.dialogType === 'Edit'
+      await saveOrg(this.org)
+      this.dialogVisible = false
+      this.$notify({
+        title: 'Success',
+        dangerouslyUseHTMLString: true,
+        type: 'success'
+      })
+      if (!isEdit) {
+        this.getOrgList()
+      }
     }
   }
 }

@@ -19,12 +19,13 @@ export function saveCompany (data) {
 // 删除公司
 export function delCompany (id) {
   return request({
-    url: '/vue-element-admin/company/del',
+    url: '/company/del',
     method: 'post',
     params: { id: id }
   })
 }
 
+// 保存融资记录
 export function saveCompanyFinancing (data) {
   return request({
     url: '/company/financing/save',
@@ -49,9 +50,10 @@ export function delCompanyFinancing (id) {
   })
 }
 
-export function getFinancingStatusList () {
+export function getTurnList () {
   return request({
-    url: '/financing/status/list',
+    url: '/common/getRounds',
     method: 'get'
   })
 }
+

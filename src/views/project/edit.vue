@@ -22,6 +22,11 @@
           <el-option v-for="item in tagList" :key="item.id" :label="item.name" :value="item" />
         </el-select>
       </el-form-item>
+      <el-form-item label="行业" label-width="100px">
+        <el-select v-model="project.industryId" style="width: 500px" placeholder="请选择">
+          <el-option v-for="item in industryList" :key="item.id" :label="item.name" :value="item.id" />
+        </el-select>
+      </el-form-item>
       <el-form-item label="主打产品" label-width="100px" prop="product">
         <el-input v-model.trim="project.product" />
       </el-form-item>
@@ -54,6 +59,7 @@
 import { getProject, saveProject } from '@/api/project'
 import { getCompanyList } from '@/api/company'
 import { getTags } from '@/api/tag'
+import { getIndustries } from '@/api/industry'
 
 export default {
   name: 'EditProject',
@@ -95,6 +101,7 @@ export default {
   },
   created () {
     this.getTagList()
+    this.getIndustryList()
     this.getCompanys()
   },
   methods: {
@@ -105,6 +112,10 @@ export default {
         this.optType = 2
         this.getProject(this.$route.query.id)
       }
+    },
+    async getIndustryList () {
+      const res = await getIndustries()
+      this.industryList = res.data
     },
     async getTagList () {
       const res = await getTags()

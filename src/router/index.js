@@ -174,7 +174,7 @@ export const asyncRoutes = [
       },
       {
         path: 'industry',
-        component: () => import('@/views/project/insutry'),
+        component: () => import('@/views/project/industry'),
         name: 'Industry',
         meta: { title: '行业管理', icon: 'form', noCache: true }
       },

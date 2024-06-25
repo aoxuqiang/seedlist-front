@@ -37,7 +37,7 @@
           </el-table-column>
           <el-table-column align="center" label="用户名称" width="150">
             <template slot-scope="scope">
-              {{ scope.row.name }}
+              {{ scope.row.uname }}
             </template>
           </el-table-column>
           <el-table-column align="header-center" label="邀请时间">
@@ -57,7 +57,7 @@
           </el-table-column>
           <el-table-column align="center" label="用户姓名" width="150">
             <template slot-scope="scope">
-              {{ scope.row.name }}
+              {{ scope.row.uname }}
             </template>
           </el-table-column>
           <el-table-column align="header-center" label="申请时间">
