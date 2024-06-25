@@ -75,14 +75,14 @@
               <el-button
                 type="primary"
                 size="small"
-                :disabled="scope.row.auditDesc != 0"
-                @click="pass(scope.row)"
+                :disabled="scope.row.auditStatus != 0"
+                @click="auditPass(scope.row)"
               >审核通过</el-button>
               <el-button
                 type="danger"
                 size="small"
-                :disabled="scope.row.auditDesc != 0"
-                @click="refuse(scope.row)"
+                :disabled="scope.row.auditStatus != 0"
+                @click="auditRefuse(scope.row)"
               >审核拒绝</el-button>
             </template>
           </el-table-column>
@@ -93,7 +93,7 @@
 </template>
 
 <script>
-import { getMeeting, getMeetingApplyList, getMeetingInviteList } from '@/api/meeting'
+import { getMeeting, getMeetingApplyList, getMeetingInviteList, passApply, refuseApply } from '@/api/meeting'
 
 export default {
   name: 'MeetingDetail',
@@ -145,6 +145,14 @@ export default {
     },
     handleSelect (key, keyPath) {
       this.activeIndex = key
+    },
+    async auditPass (row) {
+      await passApply(row.id)
+      this.applyList.filter(item => item.id === row.id)[0].state = 1
+    },
+    async auditRefuse (row) {
+      await refuseApply(row.id)
+      this.applyList.filter(item => item.id === row.id)[0].state = -1
     }
   }
 }

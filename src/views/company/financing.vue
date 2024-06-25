@@ -9,12 +9,12 @@
       </el-table-column>
       <el-table-column align="center" label="现估值">
         <template slot-scope="scope">
-          {{ scope.row.valuation }}
+          {{ showMoney(scope.row.valuation) }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="融资金额">
         <template slot-scope="scope">
-          {{ scope.row.amount }}
+          {{ showMoney(scope.row.amount) }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="融资状态">
@@ -38,21 +38,31 @@
           </el-select>
         </el-form-item>
         <el-form-item label="公司估值">
-          <el-input v-model="companyFinancingItem.valuation" placeholder="请输入金额" />
+          <el-input
+            v-model="companyFinancingItem.valuation"
+            prefix-icon="el-icon-coin"
+            placeholder="请输入金额"
+            oninput="value=value.replace(/[^0-9.]/g,'')"
+          />
         </el-form-item>
         <el-form-item label="融资金额">
-          <el-input v-model="companyFinancingItem.amount" placeholder="请输入金额" />
+          <el-input
+            v-model="companyFinancingItem.amount"
+            prefix-icon="el-icon-coin"
+            placeholder="请输入金额"
+            oninput="value=value.replace(/[^0-9.]/g,'')"
+          />
         </el-form-item>
         <el-form-item label="融资状态">
           <el-select v-model="companyFinancingItem.state">
             <el-option v-for="item in rzStatus" :key="item.state" :label="item.desc" :value="item.state" />
           </el-select>
         </el-form-item>
+        <el-form-item>
+          <el-button type="danger" @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="confirmCompanyFinancing">确认</el-button>
+        </el-form-item>
       </el-form>
-      <div style="text-align:right;">
-        <el-button type="danger" @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="confirmCompanyFinancing">确认</el-button>
-      </div>
     </el-dialog>
   </div>
 </template>
@@ -87,6 +97,17 @@ export default {
     computeState () {
       return (item) => {
         return this.rzStatus.filter(t => t.state === item)[0].desc
+      }
+    },
+    showMoney () {
+      return (money) => {
+        if (money > 100000000) {
+          return money / 100000000 + '亿'
+        } else if (money > 10000) {
+          return money / 10000 + '万'
+        } else {
+          return money + '元'
+        }
       }
     }
   },

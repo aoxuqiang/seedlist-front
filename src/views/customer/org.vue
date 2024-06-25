@@ -9,17 +9,17 @@
       </el-table-column>
       <el-table-column align="center" label="机构名称" width="200px">
         <template slot-scope="scope">
-          <a :href="scope.row.homelink" target="_blank" class="homelink">{{ scope.row.name }}</a>
+          <a :href="scope.row.homeLink" target="_blank" class="homelink">{{ scope.row.name }}</a>
         </template>
       </el-table-column>
       <el-table-column align="center" label="机构简介" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          {{ scope.row.desc }}
+          {{ scope.row.description }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="机构官网">
         <template slot-scope="scope">
-          {{ scope.row.homelink }}
+          {{ scope.row.homeLink }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="Operations" width="300px">
@@ -31,24 +31,26 @@
     </el-table>
 
     <el-dialog :visible.sync="dialogVisible" :title="dialogType === 'Edit' ? '修改投资机构' : '新增投资机构'">
-      <el-form :model="org" label-width="80px" label-position="left">
+      <el-form ref="orgForm" :model="org" :rules="rule" label-width="80px" label-position="left">
         <el-form-item v-if="dialogType === 'Edit'" label="机构ID">
-          <el-input v-model="org.key" placeholder="投资机构ID" readonly />
+          <el-input v-model="org.id" placeholder="投资机构ID" readonly />
         </el-form-item>
-        <el-form-item label="机构名称">
+        <el-form-item label="机构名称" prop="name">
           <el-input v-model="org.name" placeholder="请输入机构名称" />
         </el-form-item>
-        <el-form-item label="机构简介">
-          <el-input v-model="org.desc" placeholder="请输入机构简介" />
+        <el-form-item label="机构简介" prop="description">
+          <el-input v-model="org.description" placeholder="请输入机构简介" />
         </el-form-item>
-        <el-form-item label="机构官网">
-          <el-input v-model="org.homelink" placeholder="机构官网" />
+        <el-form-item label="机构官网" prop="homeLink">
+          <el-input v-model="org.homeLink" placeholder="机构官网">
+            <template slot="prepend">http://</template>
+          </el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="danger" @click="cancel">取消</el-button>
+          <el-button type="primary" @click="submitForm">确认</el-button>
         </el-form-item>
       </el-form>
-      <div style="text-align:left;">
-        <el-button type="danger" @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="confirmAdd">确认</el-button>
-      </div>
     </el-dialog>
   </div>
 </template>
@@ -64,7 +66,21 @@ export default {
       orgList: [],
       org: {},
       dialogVisible: false,
-      dialogType: 'New'
+      dialogType: 'New',
+      rule: {
+        name: [
+          { required: true, message: '请输入机构名称', trigger: 'blur' },
+          { min: 3, max: 20, message: '长度在3到20个字符', trigger: 'blur' }
+        ],
+        description: [
+          { required: true, message: '请输入机构简介', trigger: 'blur' },
+          { min: 5, max: 200, message: '长度在5到200个字符', trigger: 'blur' }
+        ],
+        homeLink: [
+          { required: true, message: '请输入机构官网', trigger: 'blur' },
+          { min: 8, max: 200, message: '长度在8到200个字符', trigger: 'blur' }
+        ]
+      }
     }
   },
   created () {
@@ -84,6 +100,19 @@ export default {
       this.org = scope.row
       this.dialogType === 'Edit'
       this.dialogVisible = true
+    },
+    cancel () {
+      this.$refs.orgForm.resetFields()
+      this.dialogVisible = false
+    },
+    submitForm () {
+      this.$refs.orgForm.validate((valid) => {
+        if (valid) {
+          this.confirmAdd()
+        } else {
+          return false
+        }
+      })
     },
     async confirmAdd () {
       const isEdit = this.dialogType === 'Edit'

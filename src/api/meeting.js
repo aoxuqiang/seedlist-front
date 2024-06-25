@@ -61,3 +61,19 @@ export function saveMeeting (data) {
     data
   })
 }
+
+export function passApply (id) {
+  return request({
+    url: '/meeting/apply/pass',
+    method: 'post',
+    params: { id }
+  })
+}
+
+export function refuseApply (id) {
+  return request({
+    url: '/meeting/apply/refuse',
+    method: 'post',
+    params: { id }
+  })
+}
