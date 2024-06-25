@@ -35,15 +35,15 @@ module.exports = {
     overlay: {
       warnings: false,
       errors: true
-    },
+    }
     // before: require('./mock/mock-server.js'), // 使用mock-server
     // disableHostCheck: true, // 正式环境需要去掉
-    proxy: {
-      '/': {
-        target: 'http://localhost:8008',
-        changeOrigin: true
-      }
-    }
+    // proxy: {
+    //   '/': {
+    //     target: 'http://localhost:8008',
+    //     changeOrigin: true
+    //   }
+    // }
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that

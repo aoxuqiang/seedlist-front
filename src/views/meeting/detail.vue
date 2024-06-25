@@ -76,13 +76,13 @@
                 type="primary"
                 size="small"
                 :disabled="scope.row.auditStatus != 0"
-                @click="auditPass(scope.row)"
+                @click="auditPass(scope.row.id)"
               >审核通过</el-button>
               <el-button
                 type="danger"
                 size="small"
                 :disabled="scope.row.auditStatus != 0"
-                @click="auditRefuse(scope.row)"
+                @click="auditRefuse(scope.row.id)"
               >审核拒绝</el-button>
             </template>
           </el-table-column>
@@ -146,13 +146,13 @@ export default {
     handleSelect (key, keyPath) {
       this.activeIndex = key
     },
-    async auditPass (row) {
-      await passApply(row.id)
-      this.applyList.filter(item => item.id === row.id)[0].state = 1
+    async auditPass (id) {
+      await passApply(id)
+      this.applyList.filter(item => item.id === id)[0].state = 1
     },
-    async auditRefuse (row) {
-      await refuseApply(row.id)
-      this.applyList.filter(item => item.id === row.id)[0].state = -1
+    async auditRefuse (id) {
+      await refuseApply(id)
+      this.applyList.filter(item => item.id === id)[0].state = -1
     }
   }
 }
