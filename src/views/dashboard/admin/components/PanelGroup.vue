@@ -9,20 +9,20 @@
           <div class="card-panel-text">
             用户数量
           </div>
-          <count-to :start-val="0" :end-val="102400" :duration="2600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="userCount" :duration="1" class="card-panel-num" />
         </div>
       </div>
     </el-col>
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('messages')">
         <div class="card-panel-icon-wrapper icon-message">
-          <svg-icon icon-class="message" class-name="card-panel-icon" />
+          <svg-icon icon-class="documentation" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Messages
+            项目数量
           </div>
-          <count-to :start-val="0" :end-val="81212" :duration="3000" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="projectCount" :duration="1" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -33,9 +33,9 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Purchases
+            融资金额
           </div>
-          <count-to :start-val="0" :end-val="9280" :duration="3200" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="totalMoney" :duration="1000" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -57,14 +57,41 @@
 
 <script>
 import CountTo from 'vue-count-to'
+import { getUserList } from '@/api/user'
+import { getProjects } from '@/api/project'
+import { getMoney } from '@/api/common'
 
 export default {
   components: {
     CountTo
   },
+  data () {
+    return {
+      userCount: 0,
+      projectCount: 0,
+      totalMoney: 0
+    }
+  },
+  created () {
+    this.queryUser()
+    this.queryProject()
+    this.queryMoney()
+  },
   methods: {
-    handleSetLineChartData(type) {
+    handleSetLineChartData (type) {
       this.$emit('handleSetLineChartData', type)
+    },
+    async queryUser () {
+      const res = await getUserList()
+      this.userCount = res.data.length
+    },
+    async queryProject () {
+      const res = await getProjects()
+      this.projectCount = res.data.length
+    },
+    async queryMoney () {
+      const res = await getMoney()
+      this.totalMoney = res.data
     }
   }
 }

@@ -17,12 +17,12 @@
       <el-form-item label="项目简介" prop="brief" label-width="100px">
         <el-input v-model.trim="project.brief" />
       </el-form-item>
-      <el-form-item label="标签" label-width="100px">
+      <el-form-item label="项目标签" label-width="100px">
         <el-select v-model="project.tagList" value-key="id" style="width: 500px" multiple placeholder="请选择">
           <el-option v-for="item in tagList" :key="item.id" :label="item.name" :value="item" />
         </el-select>
       </el-form-item>
-      <el-form-item label="行业" label-width="100px">
+      <el-form-item label="所属行业" label-width="100px" prop="industryId">
         <el-select v-model="project.industryId" style="width: 500px" placeholder="请选择">
           <el-option v-for="item in industryList" :key="item.id" :label="item.name" :value="item.id" />
         </el-select>
@@ -42,14 +42,14 @@
       <el-form-item label="竞争对手" label-width="100px">
         <el-input v-model.trim="project.competitor" />
       </el-form-item>
-      <el-form-item label="备注" label-width="100px">
+      <el-form-item label="项目备注" label-width="100px">
         <el-input v-model.trim="project.remark" />
       </el-form-item>
-      <el-form-item label="BP" label-width="100px">
+      <el-form-item label="项目BP" label-width="100px">
         <el-input v-model.trim="project.bp" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submit">保存</el-button>
+        <el-button type="primary" style="margin-left:100px" @click="submit">保存</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -71,9 +71,17 @@ export default {
         tags: []
       },
       rules: {
+        no: [
+          { required: true, message: '请输入项目编号', trigger: 'blur' },
+          { min: 3, max: 20, message: '长度在1到20个字符', trigger: 'blur' }
+        ],
         name: [
           { required: true, message: '请输入项目名称', trigger: 'blur' },
           { min: 3, max: 20, message: '长度在1到20个字符', trigger: 'blur' }
+        ],
+        brief: [
+          { required: true, message: '请输入项目简介', trigger: 'blur' },
+          { min: 5, max: 200, message: '长度在5到200个字符', trigger: 'blur' }
         ],
         product: [
           { required: true, message: '请输入产品', trigger: 'blur' },
@@ -81,6 +89,9 @@ export default {
         ],
         companyId: [
           { required: true, message: '请选择关联公司', trigger: 'blur' }
+        ],
+        industryId: [
+          { required: true, message: '请选择行业', trigger: 'blur' }
         ]
       },
       company: {},

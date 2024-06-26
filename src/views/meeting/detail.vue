@@ -60,7 +60,7 @@
               {{ scope.row.uname }}
             </template>
           </el-table-column>
-          <el-table-column align="header-center" label="申请时间">
+          <el-table-column align="header-center" label="申请时间" width="200">
             <template slot-scope="scope">
               {{ scope.row.createdTime }}
             </template>
@@ -148,11 +148,11 @@ export default {
     },
     async auditPass (id) {
       await passApply(id)
-      this.applyList.filter(item => item.id === id)[0].state = 1
+      this.applyList.filter(item => item.id === id)[0].auditStatus = 1
     },
     async auditRefuse (id) {
       await refuseApply(id)
-      this.applyList.filter(item => item.id === id)[0].state = -1
+      this.applyList.filter(item => item.id === id)[0].auditStatus = -1
     }
   }
 }

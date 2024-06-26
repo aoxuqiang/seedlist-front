@@ -140,7 +140,11 @@ export default {
       })
         .then(async (item) => {
           await changeShow(id, num)
-          item.show = num
+          this.projectList.filter(t => t.id === item.id)[0].show = num
+          this.$message({
+            type: 'success',
+            message: num === 1 ? '上架成功' : '下架成功'
+          })
         })
         .catch((err) => {
           console.error(err)

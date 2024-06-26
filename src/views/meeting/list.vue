@@ -60,11 +60,31 @@
         </el-form-item>
       </el-form>
     </div>
+
+    <el-dialog :visible.sync="dialogVisible" title="修改会议">
+      <el-form :model="meeting" label-width="80px" label-position="left">
+        <el-form-item label="会议时间">
+          <div>
+            <el-date-picker :key="meeting.id" v-model="meeting.startTime" type="datetime" placeholder="请选择会议时间" />
+          </div>
+        </el-form-item>
+        <el-form-item label="会议名称">
+          <el-input v-model="meeting.name" placeholder="请输入会议名称" disabled />
+        </el-form-item>
+        <el-form-item label="会议链接">
+          <el-input v-model="meeting.link" placeholder="请输入会议链接" />
+        </el-form-item>
+      </el-form>
+      <div style="text-align:right;">
+        <el-button type="danger" @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="updateMeeting">确认</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getMeetingList, delMeeting, saveMeetingInvite } from '@/api/meeting'
+import { getMeetingList, delMeeting, saveMeetingInvite, saveMeeting } from '@/api/meeting'
 import { getProjects } from '@/api/project'
 import { getUserList } from '@/api/user'
 
@@ -80,7 +100,8 @@ export default {
       userList: [],
       sendUsers: [],
       checkAll: false,
-      isIndeterminate: true
+      isIndeterminate: true,
+      dialogVisible: false
     }
   },
   created () {
@@ -126,9 +147,23 @@ export default {
       })
     },
     handleEdit (scope) {
-      this.tag = scope.row
-      this.dialogType = 'Edit'
+      this.meeting = scope.row
       this.dialogVisible = true
+    },
+    async updateMeeting () {
+      this.meeting.startTime = this.dateFormate(this.meeting.startTime)
+      await saveMeeting(this.meeting)
+      this.$message({
+        type: 'success',
+        message: '会议更新成功'
+      })
+      this.dialogVisible = false
+      this.meeting = {}
+    },
+    dateFormate (date) {
+      // 格式化日期
+      var formattedDate = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2) + ' ' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2)
+      return formattedDate
     },
     handleCheckAllChange (val) {
       console.log('===================', val)
